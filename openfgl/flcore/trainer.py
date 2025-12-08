@@ -3,6 +3,8 @@ import random
 from openfgl.data.distributed_dataset_loader import FGLDataset
 from openfgl.utils.basic_utils import load_client, load_server
 from openfgl.utils.logger import Logger
+from openfgl.flcore.fedala import FedALAClient
+from openfgl.flcore.fedala_mp import FedALAMPClient
 
 
 class FGLTrainer:

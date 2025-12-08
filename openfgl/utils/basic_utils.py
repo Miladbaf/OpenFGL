@@ -109,6 +109,18 @@ def load_client(args, client_id, data, data_dir, message_pool, device):
     elif args.fl_algorithm == "fedgl":
         from openfgl.flcore.fedgl.client import FedGLClient
         return FedGLClient(args, client_id, data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "fedala":
+        from openfgl.flcore.fedala.client import FedALAClient
+        return FedALAClient(args, client_id, data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "fedala_mp":
+        from openfgl.flcore.fedala_mp.client import FedALAMPClient
+        return FedALAMPClient(args, client_id, data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "fedala_r":
+        from openfgl.flcore.fedala_r.client import FedALARClient
+        return FedALARClient(args, client_id, data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "fedala_mpr":
+        from openfgl.flcore.fedala_mpr.client import FedALAMPRClient
+        return FedALAMPRClient(args, client_id, data, data_dir, message_pool, device)
     
 def load_server(args, global_data, data_dir, message_pool, device):
     """
@@ -181,6 +193,18 @@ def load_server(args, global_data, data_dir, message_pool, device):
     elif args.fl_algorithm == "fedgl":
         from openfgl.flcore.fedgl.server import FedGLServer
         return FedGLServer(args, global_data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "fedala":
+        from openfgl.flcore.fedavg.server import FedAvgServer
+        return FedAvgServer(args, global_data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "fedala_mp":
+        from openfgl.flcore.fedavg.server import FedAvgServer
+        return FedAvgServer(args, global_data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "fedala_r":
+        from openfgl.flcore.fedala_r.server import FedALARServer
+        return FedALARServer(args, global_data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "fedala_mpr":
+        from openfgl.flcore.fedala_r.server import FedALARServer
+        return FedALARServer(args, global_data, data_dir, message_pool, device)
     
 def load_optim(args):
     """
