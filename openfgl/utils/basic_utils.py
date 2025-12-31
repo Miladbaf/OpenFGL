@@ -121,6 +121,12 @@ def load_client(args, client_id, data, data_dir, message_pool, device):
     elif args.fl_algorithm == "fedala_mpr":
         from openfgl.flcore.fedala_mpr.client import FedALAMPRClient
         return FedALAMPRClient(args, client_id, data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "fedala_per":
+        from openfgl.flcore.fedala_prox.client import FedALAPerClient
+        return FedALAPerClient(args, client_id, data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "fedala_prox": 
+        from openfgl.flcore.fedala_prox.client import FedALAProxClient
+        return FedALAProxClient(args, client_id, data, data_dir, message_pool, device)
     
 def load_server(args, global_data, data_dir, message_pool, device):
     """
@@ -205,6 +211,12 @@ def load_server(args, global_data, data_dir, message_pool, device):
     elif args.fl_algorithm == "fedala_mpr":
         from openfgl.flcore.fedala_r.server import FedALARServer
         return FedALARServer(args, global_data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "fedala_per":
+        from openfgl.flcore.fedala_prox.server import FedALAPerServer
+        return FedALAPerServer(args, global_data, data_dir, message_pool, device)
+    elif args.fl_algorithm == "fedala_prox":  
+        from openfgl.flcore.fedala_prox.server import FedALAProxServer
+        return FedALAProxServer(args, global_data, data_dir, message_pool, device)
     
 def load_optim(args):
     """
