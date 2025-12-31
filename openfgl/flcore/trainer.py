@@ -35,9 +35,9 @@ class FGLTrainer:
         self.device = torch.device(f"cuda:{args.gpuid}" if (torch.cuda.is_available() and args.use_cuda) else "cpu")
         self.clients = [load_client(args, client_id, fgl_dataset.local_data[client_id], fgl_dataset.processed_dir, self.message_pool, self.device) for client_id in range(self.args.num_clients)]
         self.server = load_server(args, fgl_dataset.global_data, fgl_dataset.processed_dir, self.message_pool, self.device)
-        
+
         self.evaluation_result = {"best_round":0}
-        if self.args.task in ["graph_cls", "graph_reg", "node_cls", "link_pred"]:
+        if self.args.task in ["graph_cls", "graph_cls_2", "graph_reg", "node_cls", "link_pred"]:
             for metric in self.args.metrics:
                 self.evaluation_result[f"best_val_{metric}"] = 0
                 self.evaluation_result[f"best_test_{metric}"] = 0
@@ -80,8 +80,8 @@ class FGLTrainer:
         """
         # download -> local-train -> evaluate on local data
         evaluation_result = {"current_round": self.message_pool["round"]}
-        
-        if self.args.task in ["graph_cls", "graph_reg", "node_cls", "link_pred"]:
+
+        if self.args.task in ["graph_cls", "graph_cls_2", "graph_reg", "node_cls", "link_pred"]:
             for metric in self.args.metrics:
                 evaluation_result[f"current_val_{metric}"] = 0
                 evaluation_result[f"current_test_{metric}"] = 0
@@ -112,8 +112,8 @@ class FGLTrainer:
                 # only one-time infer
                 one_time_infer = True
                 result = self.server.task.evaluate()
-            
-            if self.args.task in ["graph_cls", "graph_reg", "node_cls", "link_pred"]:
+
+            if self.args.task in ["graph_cls", "graph_cls_2", "graph_reg", "node_cls", "link_pred"]:
                 for metric in self.args.metrics:
                     val_metric, test_metric = result[f"{metric}_val"], result[f"{metric}_test"]
                     evaluation_result[f"current_val_{metric}"] += val_metric * num_samples
@@ -122,32 +122,32 @@ class FGLTrainer:
                 for metric in self.args.metrics:
                     metric_value = result[f"{metric}"]
                     evaluation_result[f"current_{metric}"] += metric_value * num_samples
-                
+
             if one_time_infer:
                 tot_samples = num_samples
                 break
             else:
                 tot_samples += num_samples
-        
-        
-        
-        if self.args.task in ["graph_cls", "graph_reg", "node_cls", "link_pred"]:
+
+
+
+        if self.args.task in ["graph_cls", "graph_cls_2", "graph_reg", "node_cls", "link_pred"]:
             for metric in self.args.metrics:
                 evaluation_result[f"current_val_{metric}"] /= tot_samples
                 evaluation_result[f"current_test_{metric}"] /= tot_samples
-                
+
             if evaluation_result[f"current_val_{self.args.metrics[0]}"] > self.evaluation_result[f"best_val_{self.args.metrics[0]}"]:
                 for metric in self.args.metrics:
                     self.evaluation_result[f"best_val_{metric}"] = evaluation_result[f"current_val_{metric}"]
                     self.evaluation_result[f"best_test_{metric}"] = evaluation_result[f"current_test_{metric}"]
                 self.evaluation_result[f"best_round"] = evaluation_result[f"current_round"]
-            
+
             current_output = f"curr_round: {evaluation_result['current_round']}\t" + \
                 "\t".join([f"curr_val_{metric}: {evaluation_result[f'current_val_{metric}']:.4f}\tcurr_test_{metric}: {evaluation_result[f'current_test_{metric}']:.4f}" for metric in self.args.metrics])
-        
+
             best_output = f"best_round: {self.evaluation_result['best_round']}\t" + \
                 "\t".join([f"best_val_{metric}: {self.evaluation_result[f'best_val_{metric}']:.4f}\tbest_test_{metric}: {self.evaluation_result[f'best_test_{metric}']:.4f}" for metric in self.args.metrics])
-    
+
             print(current_output)
             print(best_output)
         else:

@@ -11,6 +11,12 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 
+try:
+    from torch_geometric.loader import DataLoader as PyGDataLoader
+except Exception:  # torch_geometric not available
+    PyGDataLoader = None
+
+
 class AdaptiveLocalAggregation:
     """
     Implements the weight-learning step of FedALA on top of a local model.
@@ -221,4 +227,140 @@ class AdaptiveLocalAggregation:
                 p_l.data.copy_(p_t.data)
 
         # From now on, only one pass per round
+        self._warmup_phase = False
+
+
+
+
+class AdaptiveLocalAggregationGraphFL(AdaptiveLocalAggregation):
+    """
+    Additive variant of AdaptiveLocalAggregation for Graph-FL (PyG batches).
+
+    Differences vs base AdaptiveLocalAggregation:
+      - uses torch_geometric.loader.DataLoader for correct Batch collation
+      - forward handles models returning (embedding, logits)
+      - loss is computed as CrossEntropy(logits, batch.y) (supervised graph cls)
+    """
+
+    @staticmethod
+    def _forward_logits_graph(model: nn.Module, batch: Any) -> torch.Tensor:
+        out = model.forward(batch) if hasattr(model, "forward") else model(batch)
+        if isinstance(out, (tuple, list)) and len(out) == 2:
+            _, logits = out
+            return logits
+        return out
+
+    def _build_random_loader(self) -> Optional[Any]:
+        if self.train_data is None:
+            return None
+
+        if PyGDataLoader is None:
+            # Cannot safely collate PyG Data objects with torch.utils DataLoader here.
+            return None
+
+        try:
+            n = len(self.train_data)
+        except TypeError:
+            return None
+
+        if n == 0 or self.rand_percent <= 0:
+            return None
+
+        subset_size = max(1, int(n * self.rand_percent / 100.0))
+        indices = random.sample(range(n), subset_size)
+        subset = [self.train_data[i] for i in indices]
+
+        return PyGDataLoader(
+            subset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            drop_last=False,
+        )
+
+    def adaptive_local_aggregation(self, global_model: nn.Module, local_model: nn.Module) -> None:
+        rand_loader = self._build_random_loader()
+        if rand_loader is None:
+            return
+
+        params_g = list(global_model.parameters())
+        params_l = list(local_model.parameters())
+        if len(params_g) == 0:
+            return
+
+        with torch.no_grad():
+            if torch.sum(params_g[0] - params_l[0]).abs().item() == 0.0:
+                return
+
+        num_groups = len(params_l)
+        top_k = self.layer_idx if self.layer_idx > 0 else num_groups
+        top_k = min(max(1, top_k), num_groups)
+
+        # lower layers: hard copy global
+        low_l = params_l[:-top_k]
+        low_g = params_g[:-top_k]
+        with torch.no_grad():
+            for p_l, p_g in zip(low_l, low_g):
+                p_l.data.copy_(p_g.data)
+
+        # tmp model
+        model_tmp = copy.deepcopy(local_model).to(self.device)
+        model_tmp.train()
+
+        params_tmp = list(model_tmp.parameters())
+        low_tmp = params_tmp[:-top_k]
+        top_tmp = params_tmp[-top_k:]
+        top_l = params_l[-top_k:]
+        top_g = params_g[-top_k:]
+
+        for p in low_tmp:
+            p.requires_grad_(False)
+
+        optimizer = torch.optim.SGD(top_tmp, lr=0.0)
+
+        if self._weights is None:
+            self._weights = [torch.ones_like(p.data, device=self.device) for p in top_l]
+
+        # init tmp top layers
+        with torch.no_grad():
+            for p_t, p_l, p_g, w in zip(top_tmp, top_l, top_g, self._weights):
+                p_t.data.copy_(p_l.data + (p_g.data - p_l.data) * w.data)
+
+        losses: list[float] = []
+
+        while True:
+            for batch in rand_loader:
+                batch = batch.to(self.device)
+                y = batch.y.to(self.device)
+
+                optimizer.zero_grad(set_to_none=False)  # reduce None-grad incidence
+                logits = self._forward_logits_graph(model_tmp, batch)
+                loss = self.loss_fn(logits, y)
+                loss.backward()
+
+                with torch.no_grad():
+                    for w, p_t, p_l, p_g in zip(self._weights, top_tmp, top_l, top_g):
+                        if p_t.grad is None:
+                            # Parameter did not receive gradient in this backward pass.
+                            # Skip updating its weight; keep current w and p_t.
+                            continue
+
+                        grad_w = p_t.grad * (p_g.data - p_l.data)
+                        w.data.add_(-self.eta * grad_w).clamp_(0.0, 1.0)
+                        p_t.data.copy_(p_l.data + (p_g.data - p_l.data) * w.data)
+
+                losses.append(float(loss.item()))
+
+            if not self._warmup_phase:
+                break
+
+            if len(losses) >= self.num_pre_loss:
+                tail = losses[-self.num_pre_loss:]
+                if np.std(tail) < self.std_threshold:
+                    break
+
+        # copy adapted top layers back
+        with torch.no_grad():
+            for p_l, p_t in zip(top_l, top_tmp):
+                p_l.data.copy_(p_t.data)
+
         self._warmup_phase = False

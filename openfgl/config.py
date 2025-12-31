@@ -13,7 +13,7 @@ supported_subgraph_fl_datasets = [
 supported_graph_fl_simulations = ["graph_fl_cross_domain", "graph_fl_label_skew", "graph_fl_topology_skew", "graph_fl_feature_skew"]
 supported_subgraph_fl_simulations = ["subgraph_fl_label_skew", "subgraph_fl_louvain_plus", "subgraph_fl_metis_plus", "subgraph_fl_louvain", "subgraph_fl_metis"]
 
-supported_graph_fl_task = ["graph_cls", "graph_reg"]
+supported_graph_fl_task = ["graph_cls", "graph_cls_2", "graph_reg"]
 supported_subgraph_fl_task = ["node_cls", "link_pred", "node_clust"]
 
 

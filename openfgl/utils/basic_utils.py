@@ -5,10 +5,9 @@ import sys
 from collections.abc import Iterable
 
 
-
 def seed_everything(seed):
     """
-    Sets the seed for multiple random number generators to ensure reproducibility across runs. 
+    Sets the seed for multiple random number generators to ensure reproducibility across runs.
     It also configures the behavior of the CUDA backend for deterministic output.
 
     Args:
@@ -33,10 +32,8 @@ def seed_everything(seed):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.enabled = False
-    
 
-    
-    
+
 def load_client(args, client_id, data, data_dir, message_pool, device):
     """
     Loads and returns an instance of a client based on the federated learning algorithm specified in the arguments.
@@ -110,8 +107,16 @@ def load_client(args, client_id, data, data_dir, message_pool, device):
         from openfgl.flcore.fedgl.client import FedGLClient
         return FedGLClient(args, client_id, data, data_dir, message_pool, device)
     elif args.fl_algorithm == "fedala":
-        from openfgl.flcore.fedala.client import FedALAClient
-        return FedALAClient(args, client_id, data, data_dir, message_pool, device)
+        # Route Graph-FL to the Graph-FL specialized FedALA client.
+        # Keep the existing FedALAClient for all other scenarios/tasks (e.g., subgraph FL).
+        if getattr(args, "scenario", None) == "graph_fl" and getattr(args, "task", None) in ["graph_cls", "graph_cls_2",
+                                                                                             "graph_reg"]:
+            from openfgl.flcore.fedala.client_graphfl import FedALAGraphFLClient
+            return FedALAGraphFLClient(args, client_id, data, data_dir, message_pool, device)
+        else:
+            from openfgl.flcore.fedala.client import FedALAClient
+            return FedALAClient(args, client_id, data, data_dir, message_pool, device)
+
     elif args.fl_algorithm == "fedala_mp":
         from openfgl.flcore.fedala_mp.client import FedALAMPClient
         return FedALAMPClient(args, client_id, data, data_dir, message_pool, device)
@@ -121,13 +126,8 @@ def load_client(args, client_id, data, data_dir, message_pool, device):
     elif args.fl_algorithm == "fedala_mpr":
         from openfgl.flcore.fedala_mpr.client import FedALAMPRClient
         return FedALAMPRClient(args, client_id, data, data_dir, message_pool, device)
-    elif args.fl_algorithm == "fedala_per":
-        from openfgl.flcore.fedala_prox.client import FedALAPerClient
-        return FedALAPerClient(args, client_id, data, data_dir, message_pool, device)
-    elif args.fl_algorithm == "fedala_prox": 
-        from openfgl.flcore.fedala_prox.client import FedALAProxClient
-        return FedALAProxClient(args, client_id, data, data_dir, message_pool, device)
-    
+
+
 def load_server(args, global_data, data_dir, message_pool, device):
     """
     Loads and returns an instance of a server based on the federated learning algorithm specified in the arguments.
@@ -211,13 +211,8 @@ def load_server(args, global_data, data_dir, message_pool, device):
     elif args.fl_algorithm == "fedala_mpr":
         from openfgl.flcore.fedala_r.server import FedALARServer
         return FedALARServer(args, global_data, data_dir, message_pool, device)
-    elif args.fl_algorithm == "fedala_per":
-        from openfgl.flcore.fedala_prox.server import FedALAPerServer
-        return FedALAPerServer(args, global_data, data_dir, message_pool, device)
-    elif args.fl_algorithm == "fedala_prox":  
-        from openfgl.flcore.fedala_prox.server import FedALAProxServer
-        return FedALAProxServer(args, global_data, data_dir, message_pool, device)
-    
+
+
 def load_optim(args):
     """
     Loads and returns an optimizer class based on the specification in the arguments.
@@ -231,8 +226,8 @@ def load_optim(args):
     if args.optim == "adam":
         from torch.optim import Adam
         return Adam
-    
-    
+
+
 def load_task(args, client_id, data, data_dir, device):
     """
     Loads and returns a task instance based on the task type specified in the arguments.
@@ -253,13 +248,15 @@ def load_task(args, client_id, data, data_dir, device):
     elif args.task == "graph_cls":
         from openfgl.task.graph_cls import GraphClsTask
         return GraphClsTask(args, client_id, data, data_dir, device)
+    elif args.task == "graph_cls_2":
+        from openfgl.task.graph_cls_2 import GraphClsTask
+        return GraphClsTask(args, client_id, data, data_dir, device)
     elif args.task == "link_pred":
         from openfgl.task.link_pred import LinkPredTask
         return LinkPredTask(args, client_id, data, data_dir, device)
     elif args.task == "node_clust":
         from openfgl.task.node_clust import NodeClustTask
         return NodeClustTask(args, client_id, data, data_dir, device)
-    
 
 
 def extract_floats(s):
@@ -283,6 +280,7 @@ def extract_floats(s):
     assert Decimal(parts[0]) + Decimal(parts[1]) + Decimal(parts[2]) == Decimal(1)
     return train, val, test
 
+
 def idx_to_mask_tensor(idx_list, length):
     """
     Converts a list of indices to a tensor mask of a specified length.
@@ -299,7 +297,6 @@ def idx_to_mask_tensor(idx_list, length):
     return mask
 
 
-
 def mask_tensor_to_idx(tensor):
     """
     Converts a tensor mask to a list of indices where the tensor is non-zero.
@@ -314,10 +311,11 @@ def mask_tensor_to_idx(tensor):
     if type(result) is not list:
         result = [result]
     return result
-    
+
 
 import sys
 import torch
+
 
 def total_size(o):
     """Calculate the total memory size of a given object, avoiding infinite recursion.
@@ -339,8 +337,7 @@ def total_size(o):
     return size
 
 
-
-def model_complexity(model:torch.nn.Module):
+def model_complexity(model: torch.nn.Module):
     """
     Calculates the complexity of a PyTorch model by counting the number of parameters and computing FLOPs.
 
@@ -353,4 +350,4 @@ def model_complexity(model:torch.nn.Module):
     from fvcore.nn import FlopCountAnalysis, parameter_count
     params = sum([val for val in parameter_count(model).values()])
     return params
-    
+
