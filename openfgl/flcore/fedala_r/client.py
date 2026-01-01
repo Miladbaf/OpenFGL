@@ -1,5 +1,3 @@
-# openfgl/flcore/fedala_r/client_ihsan.py
-
 import copy
 import torch
 import torch.nn as nn
@@ -34,15 +32,32 @@ def _get_train_dataset_for_ala(task):
 
 
 def _get_ala_loss_fn(task):
-    if hasattr(task, "default_loss_fn") and callable(task.default_loss_fn):
-        crit = task.default_loss_fn()
-        if isinstance(crit, nn.Module):
-            return lambda logits, labels: crit(logits, labels)
-
+    """
+    ALA expects: loss_fn(logits, labels) -> scalar
+    Returns a callable loss function.
+    """
+    # Try getting the loss function from task
+    loss_fn_attr = getattr(task, "default_loss_fn", None)
+    
+    # Case 1: It's already a loss function instance (nn.Module)
+    if isinstance(loss_fn_attr, nn.Module):
+        return lambda logits, labels: loss_fn_attr(logits, labels)
+    
+    # Case 2: It's a callable that returns a loss function
+    if callable(loss_fn_attr):
+        try:
+            crit = loss_fn_attr()  # Call it to get the instance
+            if isinstance(crit, nn.Module):
+                return lambda logits, labels: crit(logits, labels)
+        except:
+            pass
+    
+    # Case 3: Try task.criterion
     crit = getattr(task, "criterion", None)
     if isinstance(crit, nn.Module):
         return lambda logits, labels: crit(logits, labels)
-
+    
+    # Case 4: Fallback to default CrossEntropyLoss
     crit = nn.CrossEntropyLoss()
     return lambda logits, labels: crit(logits, labels)
 
