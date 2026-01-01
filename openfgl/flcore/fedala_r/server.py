@@ -1,67 +1,101 @@
+# openfgl/flcore/fedala_r/server_ihsan.py
 """
-FedALA-R Server: FedAvg aggregation with residual computation
+FedALA-R Server (Graph-FL + Subgraph-FL compatible)
+
+- Aggregation: FedAvg (sample-weighted)
+- Residual (DEFAULT): delta residual
+    R^t = Θ^t - Θ^{t-1}
+- (OPTIONAL / COMMENTED): EMA residual
+    R_ema^t = ema * R_ema^{t-1} + (1-ema) * (Θ^t - Θ^{t-1})
 """
 
 import torch
-from openfgl.flcore.fedavg.server import FedAvgServer
+from openfgl.flcore.base import BaseServer
 
 
-class FedALARServer(FedAvgServer):
-    """FedALA-R server computes global residual R^t = Θ^t - Θ^{t-1}"""
-
+class FedALARServer(BaseServer):
     def __init__(self, args, global_data, data_dir, message_pool, device):
-        super(FedALARServer, self).__init__(
-            args, global_data, data_dir, message_pool, device
-        )
-        self.previous_global_params = None
-        self.personalized = False
+        super().__init__(args, global_data, data_dir, message_pool, device, personalized=False)
+        self.prev_global_params = None
 
+        # ---- EMA option (kept, but not active by default) ----
+        # self.ema_decay = float(getattr(args, "residual_ema_decay", 0.9))
+        # self.ema_residual = None
+
+    @torch.no_grad()
     def execute(self):
-        """Aggregate clients and compute residual"""
+        # ----------------------------
+        # 1) FedAvg aggregation
+        # ----------------------------
+        sampled_clients = self.message_pool.get(
+            "sampled_clients", list(range(self.args.num_clients))
+        )
+
+        # total samples for weighting
+        num_tot = 0
+        for cid in sampled_clients:
+            num_tot += int(self.message_pool[f"client_{cid}"]["num_samples"])
+
+        # guard: avoid division by zero
+        if num_tot == 0:
+            raise ValueError("FedALARServer: total num_samples across sampled clients is 0.")
+
+        # initialize accumulator tensors
+        aggregated = [torch.zeros_like(p.data) for p in self.task.model.parameters()]
+
+        # accumulate weighted client parameters
+        for cid in sampled_clients:
+            msg = self.message_pool[f"client_{cid}"]
+            n = int(msg["num_samples"])
+            w = n / float(num_tot)
+
+            client_params = msg["weight"]
+            for i, cp in enumerate(client_params):
+                cp_t = cp.data if hasattr(cp, "data") else cp
+                aggregated[i].add_(cp_t.to(aggregated[i].device), alpha=w)
+
+        # write back to global model
+        for p, a in zip(self.task.model.parameters(), aggregated):
+            p.data.copy_(a)
+
+        # ----------------------------
+        # 2) Residual computation (DELTA)
+        # ----------------------------
+        if self.prev_global_params is None:
+            delta_residual = [torch.zeros_like(p.data) for p in self.task.model.parameters()]
+        else:
+            delta_residual = [
+                (p.data - prev.to(p.data.device))
+                for p, prev in zip(self.task.model.parameters(), self.prev_global_params)
+            ]
+
+        # update prev snapshot for next round
+        self.prev_global_params = [p.data.clone() for p in self.task.model.parameters()]
+
+        # ----------------------------
+        # 3) OPTIONAL: EMA residual (COMMENTED OUT)
+        # ----------------------------
+        # if self.ema_residual is None:
+        #     self.ema_residual = [r.clone() for r in delta_residual]
+        # else:
+        #     for i in range(len(delta_residual)):
+        #         self.ema_residual[i].mul_(self.ema_decay).add_(delta_residual[i], alpha=(1.0 - self.ema_decay))
+        #
+        # residual_to_send = self.ema_residual
+
+        # DEFAULT (delta)
+        residual_to_send = delta_residual
+
+        # ----------------------------
+        # 4) publish to message pool
+        # ----------------------------
         if "server" not in self.message_pool:
             self.message_pool["server"] = {}
 
-        if self.previous_global_params is None:
-            self.previous_global_params = [
-                param.data.clone() for param in self.task.model.parameters()
-            ]
-
-        sampled_clients = self.message_pool["sampled_clients"]
-        clients_weight_list = [
-            self.message_pool[f"client_{client_id}"]["weight"]
-            for client_id in sampled_clients
-        ]
-        clients_sample_nums = [
-            self.message_pool[f"client_{client_id}"]["num_samples"]
-            for client_id in sampled_clients
-        ]
-        total_samples = sum(clients_sample_nums)
-
-        aggregated_params = []
-        for param_idx in range(len(clients_weight_list[0])):
-            agg_param = 0.0
-            for client_idx, client_weight in enumerate(clients_weight_list):
-                client_param = client_weight[param_idx].data
-                weight = clients_sample_nums[client_idx] / total_samples
-                agg_param = agg_param + client_param * weight
-            aggregated_params.append(agg_param)
-
-        global_residual = []
-        for prev_param, agg_param in zip(self.previous_global_params, aggregated_params):
-            global_residual.append(agg_param - prev_param)
-
-        with torch.no_grad():
-            for param, aggregated in zip(self.task.model.parameters(), aggregated_params):
-                param.data.copy_(aggregated)
-
-        self.previous_global_params = [
-            param.data.clone() for param in self.task.model.parameters()
-        ]
-
-        self.message_pool["server"]["residual"] = global_residual
+        self.message_pool["server"]["residual"] = residual_to_send
 
     def send_message(self):
-        """Broadcast global model and residual"""
         if "server" not in self.message_pool:
             self.message_pool["server"] = {}
         self.message_pool["server"]["weight"] = list(self.task.model.parameters())
+        # residual is produced in execute()
