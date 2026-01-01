@@ -244,18 +244,15 @@ class AdaptiveLocalAggregationGraphFL(AdaptiveLocalAggregation):
 
     @staticmethod
     def _forward_logits_graph(model: nn.Module, batch: Any) -> torch.Tensor:
-        out = model.forward(batch) if hasattr(model, "forward") else model(batch)
+        out = model(batch)
         if isinstance(out, (tuple, list)) and len(out) == 2:
-            _, logits = out
-            return logits
+            return out[1]
         return out
 
     def _build_random_loader(self) -> Optional[Any]:
         if self.train_data is None:
             return None
-
         if PyGDataLoader is None:
-            # Cannot safely collate PyG Data objects with torch.utils DataLoader here.
             return None
 
         try:
@@ -273,7 +270,7 @@ class AdaptiveLocalAggregationGraphFL(AdaptiveLocalAggregation):
         return PyGDataLoader(
             subset,
             batch_size=self.batch_size,
-            shuffle=False,
+            shuffle=True,
             drop_last=False,
         )
 
@@ -296,15 +293,12 @@ class AdaptiveLocalAggregationGraphFL(AdaptiveLocalAggregation):
         top_k = min(max(1, top_k), num_groups)
 
         # lower layers: hard copy global
-        low_l = params_l[:-top_k]
-        low_g = params_g[:-top_k]
         with torch.no_grad():
-            for p_l, p_g in zip(low_l, low_g):
+            for p_l, p_g in zip(params_l[:-top_k], params_g[:-top_k]):
                 p_l.data.copy_(p_g.data)
 
-        # tmp model
         model_tmp = copy.deepcopy(local_model).to(self.device)
-        model_tmp.train()
+        model_tmp.eval()  # <<< IMPORTANT: stable loss for convergence criterion
 
         params_tmp = list(model_tmp.parameters())
         low_tmp = params_tmp[:-top_k]
@@ -315,24 +309,29 @@ class AdaptiveLocalAggregationGraphFL(AdaptiveLocalAggregation):
         for p in low_tmp:
             p.requires_grad_(False)
 
-        optimizer = torch.optim.SGD(top_tmp, lr=0.0)
-
         if self._weights is None:
             self._weights = [torch.ones_like(p.data, device=self.device) for p in top_l]
 
-        # init tmp top layers
         with torch.no_grad():
             for p_t, p_l, p_g, w in zip(top_tmp, top_l, top_g, self._weights):
                 p_t.data.copy_(p_l.data + (p_g.data - p_l.data) * w.data)
 
         losses: list[float] = []
+        warmup_passes = 0
 
         while True:
             for batch in rand_loader:
                 batch = batch.to(self.device)
-                y = batch.y.to(self.device)
 
-                optimizer.zero_grad(set_to_none=False)  # reduce None-grad incidence
+                # <<< IMPORTANT: make CE-compatible labels
+                y = batch.y
+                if y is None:
+                    return
+                y = y.view(-1).long().to(self.device)
+
+                for p in top_tmp:
+                    p.grad = None
+
                 logits = self._forward_logits_graph(model_tmp, batch)
                 loss = self.loss_fn(logits, y)
                 loss.backward()
@@ -340,10 +339,7 @@ class AdaptiveLocalAggregationGraphFL(AdaptiveLocalAggregation):
                 with torch.no_grad():
                     for w, p_t, p_l, p_g in zip(self._weights, top_tmp, top_l, top_g):
                         if p_t.grad is None:
-                            # Parameter did not receive gradient in this backward pass.
-                            # Skip updating its weight; keep current w and p_t.
                             continue
-
                         grad_w = p_t.grad * (p_g.data - p_l.data)
                         w.data.add_(-self.eta * grad_w).clamp_(0.0, 1.0)
                         p_t.data.copy_(p_l.data + (p_g.data - p_l.data) * w.data)
@@ -353,12 +349,15 @@ class AdaptiveLocalAggregationGraphFL(AdaptiveLocalAggregation):
             if not self._warmup_phase:
                 break
 
+            warmup_passes += 1
+            if warmup_passes >= self.max_warmup_passes:
+                break
+
             if len(losses) >= self.num_pre_loss:
-                tail = losses[-self.num_pre_loss:]
+                tail = losses[-self.num_pre_loss :]
                 if np.std(tail) < self.std_threshold:
                     break
 
-        # copy adapted top layers back
         with torch.no_grad():
             for p_l, p_t in zip(top_l, top_tmp):
                 p_l.data.copy_(p_t.data)

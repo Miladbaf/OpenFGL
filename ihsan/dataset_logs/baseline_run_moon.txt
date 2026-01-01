@@ -1,0 +1,162 @@
+BASE_DATA_ROOT: C:\Users\suuser\Desktop\Practices\OpenFGL\OpenFGL\data_table6_graphfl_a1_multi
+Total runs (instances × seeds × methods): 30
+
+================ SETUP: MUTAG | inst=01/2 | seed=42 ================
+
+[0001/30] Running moon | MUTAG | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.5794
+
+================ SETUP: MUTAG | inst=01/2 | seed=123 ================
+
+[0002/30] Running moon | MUTAG | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.7186
+
+================ SETUP: MUTAG | inst=01/2 | seed=456 ================
+
+[0003/30] Running moon | MUTAG | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.7830
+
+================ SETUP: MUTAG | inst=02/2 | seed=42 ================
+
+[0004/30] Running moon | MUTAG | inst=02 | seed=42 ...
+  [result] best_test_accuracy=0.8209
+
+================ SETUP: MUTAG | inst=02/2 | seed=123 ================
+
+[0005/30] Running moon | MUTAG | inst=02 | seed=123 ...
+  [result] best_test_accuracy=0.7943
+
+================ SETUP: MUTAG | inst=02/2 | seed=456 ================
+
+[0006/30] Running moon | MUTAG | inst=02 | seed=456 ...
+  [result] best_test_accuracy=0.8980
+
+================ SETUP: COX2 | inst=01/2 | seed=42 ================
+
+[0007/30] Running moon | COX2 | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.7938
+
+================ SETUP: COX2 | inst=01/2 | seed=123 ================
+
+[0008/30] Running moon | COX2 | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.7780
+
+================ SETUP: COX2 | inst=01/2 | seed=456 ================
+
+[0009/30] Running moon | COX2 | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.7780
+
+================ SETUP: COX2 | inst=02/2 | seed=42 ================
+
+[0010/30] Running moon | COX2 | inst=02 | seed=42 ...
+  [result] best_test_accuracy=0.7772
+
+================ SETUP: COX2 | inst=02/2 | seed=123 ================
+
+[0011/30] Running moon | COX2 | inst=02 | seed=123 ...
+  [result] best_test_accuracy=0.7715
+
+================ SETUP: COX2 | inst=02/2 | seed=456 ================
+
+[0012/30] Running moon | COX2 | inst=02 | seed=456 ...
+  [result] best_test_accuracy=0.8034
+
+================ SETUP: BZR | inst=01/2 | seed=42 ================
+
+[0013/30] Running moon | BZR | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.8476
+
+================ SETUP: BZR | inst=01/2 | seed=123 ================
+
+[0014/30] Running moon | BZR | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.7914
+
+================ SETUP: BZR | inst=01/2 | seed=456 ================
+
+[0015/30] Running moon | BZR | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.8095
+
+================ SETUP: BZR | inst=02/2 | seed=42 ================
+
+[0016/30] Running moon | BZR | inst=02 | seed=42 ...
+  [result] best_test_accuracy=0.7286
+
+================ SETUP: BZR | inst=02/2 | seed=123 ================
+
+[0017/30] Running moon | BZR | inst=02 | seed=123 ...
+  [result] best_test_accuracy=0.7259
+
+================ SETUP: BZR | inst=02/2 | seed=456 ================
+
+[0018/30] Running moon | BZR | inst=02 | seed=456 ...
+  [result] best_test_accuracy=0.7039
+
+================ SETUP: AIDS | inst=01/1 | seed=42 ================
+
+[0019/30] Running moon | AIDS | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.9664
+
+================ SETUP: AIDS | inst=01/1 | seed=123 ================
+
+[0020/30] Running moon | AIDS | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.9616
+
+================ SETUP: AIDS | inst=01/1 | seed=456 ================
+
+[0021/30] Running moon | AIDS | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.9629
+
+================ SETUP: PROTEINS | inst=01/3 | seed=42 ================
+
+[0022/30] Running moon | PROTEINS | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.7074
+
+================ SETUP: PROTEINS | inst=01/3 | seed=123 ================
+
+[0023/30] Running moon | PROTEINS | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.6741
+
+================ SETUP: PROTEINS | inst=01/3 | seed=456 ================
+
+[0024/30] Running moon | PROTEINS | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.7505
+
+================ SETUP: PROTEINS | inst=02/3 | seed=42 ================
+
+[0025/30] Running moon | PROTEINS | inst=02 | seed=42 ...
+  [result] best_test_accuracy=0.7450
+
+================ SETUP: PROTEINS | inst=02/3 | seed=123 ================
+
+[0026/30] Running moon | PROTEINS | inst=02 | seed=123 ...
+  [result] best_test_accuracy=0.6077
+
+================ SETUP: PROTEINS | inst=02/3 | seed=456 ================
+
+[0027/30] Running moon | PROTEINS | inst=02 | seed=456 ...
+  [result] best_test_accuracy=0.6173
+
+================ SETUP: PROTEINS | inst=03/3 | seed=42 ================
+
+[0028/30] Running moon | PROTEINS | inst=03 | seed=42 ...
+  [result] best_test_accuracy=0.8359
+
+================ SETUP: PROTEINS | inst=03/3 | seed=123 ================
+
+[0029/30] Running moon | PROTEINS | inst=03 | seed=123 ...
+  [result] best_test_accuracy=0.7364
+
+================ SETUP: PROTEINS | inst=03/3 | seed=456 ================
+
+[0030/30] Running moon | PROTEINS | inst=03 | seed=456 ...
+  [result] best_test_accuracy=0.7032
+
+================ FINAL SUMMARY (mean ± std, NaNs ignored) ================
+moon       | MUTAG      -> 0.7657 ± 0.0988 (n=6)
+moon       | COX2       -> 0.7837 ± 0.0112 (n=6)
+moon       | BZR        -> 0.7678 ± 0.0517 (n=6)
+moon       | AIDS       -> 0.9636 ± 0.0021 (n=3)
+moon       | PROTEINS   -> 0.7086 ± 0.0665 (n=9)
+
+Saved results_baseline_moon.npy
+

@@ -1,0 +1,224 @@
+
+================ SETUP: MUTAG | inst=01/2 | seed=42 ================
+
+[0001/60] Running fedala | MUTAG | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.6805
+[0002/60] Running fedala_r | MUTAG | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.7904
+
+================ SETUP: MUTAG | inst=01/2 | seed=123 ================
+
+[0003/60] Running fedala | MUTAG | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.7106
+[0004/60] Running fedala_r | MUTAG | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.7154
+
+================ SETUP: MUTAG | inst=01/2 | seed=456 ================
+
+[0005/60] Running fedala | MUTAG | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.6716
+[0006/60] Running fedala_r | MUTAG | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.8285
+
+================ SETUP: MUTAG | inst=02/2 | seed=42 ================
+
+[0007/60] Running fedala | MUTAG | inst=02 | seed=42 ...
+  [result] best_test_accuracy=0.7816
+[0008/60] Running fedala_r | MUTAG | inst=02 | seed=42 ...
+  [result] best_test_accuracy=0.8555
+
+================ SETUP: MUTAG | inst=02/2 | seed=123 ================
+
+[0009/60] Running fedala | MUTAG | inst=02 | seed=123 ...
+  [result] best_test_accuracy=0.7810
+[0010/60] Running fedala_r | MUTAG | inst=02 | seed=123 ...
+  [result] best_test_accuracy=0.8209
+
+================ SETUP: MUTAG | inst=02/2 | seed=456 ================
+
+[0011/60] Running fedala | MUTAG | inst=02 | seed=456 ...
+  [result] best_test_accuracy=0.8980
+[0012/60] Running fedala_r | MUTAG | inst=02 | seed=456 ...
+  [result] best_test_accuracy=0.9521
+
+================ SETUP: COX2 | inst=01/2 | seed=42 ================
+
+[0013/60] Running fedala | COX2 | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.7934
+[0014/60] Running fedala_r | COX2 | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.7934
+
+================ SETUP: COX2 | inst=01/2 | seed=123 ================
+
+[0015/60] Running fedala | COX2 | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.7934
+[0016/60] Running fedala_r | COX2 | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.7877
+
+================ SETUP: COX2 | inst=01/2 | seed=456 ================
+
+[0017/60] Running fedala | COX2 | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.7770
+[0018/60] Running fedala_r | COX2 | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.7934
+
+================ SETUP: COX2 | inst=02/2 | seed=42 ================
+
+[0019/60] Running fedala | COX2 | inst=02 | seed=42 ...
+  [result] best_test_accuracy=0.8423
+[0020/60] Running fedala_r | COX2 | inst=02 | seed=42 ...
+  [result] best_test_accuracy=0.7922
+
+================ SETUP: COX2 | inst=02/2 | seed=123 ================
+
+[0021/60] Running fedala | COX2 | inst=02 | seed=123 ...
+  [result] best_test_accuracy=0.8395
+[0022/60] Running fedala_r | COX2 | inst=02 | seed=123 ...
+  [result] best_test_accuracy=0.7922
+
+================ SETUP: COX2 | inst=02/2 | seed=456 ================
+
+[0023/60] Running fedala | COX2 | inst=02 | seed=456 ...
+  [result] best_test_accuracy=0.8196
+[0024/60] Running fedala_r | COX2 | inst=02 | seed=456 ...
+  [result] best_test_accuracy=0.7922
+
+================ SETUP: BZR | inst=01/2 | seed=42 ================
+
+[0025/60] Running fedala | BZR | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.8629
+[0026/60] Running fedala_r | BZR | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.7914
+
+================ SETUP: BZR | inst=01/2 | seed=123 ================
+
+[0027/60] Running fedala | BZR | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.8436
+[0028/60] Running fedala_r | BZR | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.7914
+
+================ SETUP: BZR | inst=01/2 | seed=456 ================
+
+[0029/60] Running fedala | BZR | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.8436
+[0030/60] Running fedala_r | BZR | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.7913
+
+================ SETUP: BZR | inst=02/2 | seed=42 ================
+
+[0031/60] Running fedala | BZR | inst=02 | seed=42 ...
+  [result] best_test_accuracy=0.7278
+[0032/60] Running fedala_r | BZR | inst=02 | seed=42 ...
+  [result] best_test_accuracy=0.7058
+
+================ SETUP: BZR | inst=02/2 | seed=123 ================
+
+[0033/60] Running fedala | BZR | inst=02 | seed=123 ...
+  [result] best_test_accuracy=0.7278
+[0034/60] Running fedala_r | BZR | inst=02 | seed=123 ...
+  [result] best_test_accuracy=0.7365
+
+================ SETUP: BZR | inst=02/2 | seed=456 ================
+
+[0035/60] Running fedala | BZR | inst=02 | seed=456 ...
+  [result] best_test_accuracy=0.8299
+[0036/60] Running fedala_r | BZR | inst=02 | seed=456 ...
+  [result] best_test_accuracy=0.7352
+
+================ SETUP: AIDS | inst=01/1 | seed=42 ================
+
+[0037/60] Running fedala | AIDS | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.9908
+[0038/60] Running fedala_r | AIDS | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.9447
+
+================ SETUP: AIDS | inst=01/1 | seed=123 ================
+
+[0039/60] Running fedala | AIDS | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.9854
+[0040/60] Running fedala_r | AIDS | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.9133
+
+================ SETUP: AIDS | inst=01/1 | seed=456 ================
+
+[0041/60] Running fedala | AIDS | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.9487
+[0042/60] Running fedala_r | AIDS | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.9420
+
+================ SETUP: PROTEINS | inst=01/3 | seed=42 ================
+
+[0043/60] Running fedala | PROTEINS | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.7207
+[0044/60] Running fedala_r | PROTEINS | inst=01 | seed=42 ...
+  [result] best_test_accuracy=0.6882
+
+================ SETUP: PROTEINS | inst=01/3 | seed=123 ================
+
+[0045/60] Running fedala | PROTEINS | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.8091
+[0046/60] Running fedala_r | PROTEINS | inst=01 | seed=123 ...
+  [result] best_test_accuracy=0.6985
+
+================ SETUP: PROTEINS | inst=01/3 | seed=456 ================
+
+[0047/60] Running fedala | PROTEINS | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.6926
+[0048/60] Running fedala_r | PROTEINS | inst=01 | seed=456 ...
+  [result] best_test_accuracy=0.6074
+
+================ SETUP: PROTEINS | inst=02/3 | seed=42 ================
+
+[0049/60] Running fedala | PROTEINS | inst=02 | seed=42 ...
+  [result] best_test_accuracy=0.7978
+[0050/60] Running fedala_r | PROTEINS | inst=02 | seed=42 ...
+  [result] best_test_accuracy=0.7308
+
+================ SETUP: PROTEINS | inst=02/3 | seed=123 ================
+
+[0051/60] Running fedala | PROTEINS | inst=02 | seed=123 ...
+  [result] best_test_accuracy=0.8244
+[0052/60] Running fedala_r | PROTEINS | inst=02 | seed=123 ...
+  [result] best_test_accuracy=0.6182
+
+================ SETUP: PROTEINS | inst=02/3 | seed=456 ================
+
+[0053/60] Running fedala | PROTEINS | inst=02 | seed=456 ...
+  [result] best_test_accuracy=0.7495
+[0054/60] Running fedala_r | PROTEINS | inst=02 | seed=456 ...
+  [result] best_test_accuracy=0.7391
+
+================ SETUP: PROTEINS | inst=03/3 | seed=42 ================
+
+[0055/60] Running fedala | PROTEINS | inst=03 | seed=42 ...
+  [result] best_test_accuracy=0.7082
+[0056/60] Running fedala_r | PROTEINS | inst=03 | seed=42 ...
+  [result] best_test_accuracy=0.7059
+
+================ SETUP: PROTEINS | inst=03/3 | seed=123 ================
+
+[0057/60] Running fedala | PROTEINS | inst=03 | seed=123 ...
+  [result] best_test_accuracy=0.9049
+[0058/60] Running fedala_r | PROTEINS | inst=03 | seed=123 ...
+  [result] best_test_accuracy=0.7262
+
+================ SETUP: PROTEINS | inst=03/3 | seed=456 ================
+
+[0059/60] Running fedala | PROTEINS | inst=03 | seed=456 ...
+  [result] best_test_accuracy=0.8979
+[0060/60] Running fedala_r | PROTEINS | inst=03 | seed=456 ...
+  [result] best_test_accuracy=0.7778
+
+================ FINAL SUMMARY (mean ± std, NaNs ignored) ================
+fedala     | MUTAG      -> 0.7539 ± 0.0778 (n=6)
+fedala     | COX2       -> 0.8109 ± 0.0246 (n=6)
+fedala     | BZR        -> 0.8059 ± 0.0561 (n=6)
+fedala     | AIDS       -> 0.9750 ± 0.0187 (n=3)
+fedala     | PROTEINS   -> 0.7895 ± 0.0738 (n=9)
+fedala_r   | MUTAG      -> 0.8272 ± 0.0711 (n=6)
+fedala_r   | COX2       -> 0.7919 ± 0.0020 (n=6)
+fedala_r   | BZR        -> 0.7586 ± 0.0343 (n=6)
+fedala_r   | AIDS       -> 0.9334 ± 0.0142 (n=3)
+fedala_r   | PROTEINS   -> 0.6991 ± 0.0524 (n=9)
+
+Saved detailed results to: ./results_compare_graphfl_methods.npy

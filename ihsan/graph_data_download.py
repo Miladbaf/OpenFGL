@@ -4,6 +4,11 @@ import copy
 from openfgl import config
 from openfgl.data.distributed_dataset_loader import FGLDataset
 
+import os, sys
+
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
 
 DATA_ROOT = "../data_table6_graphfl_a1"
 DATASETS = ["NCI1"]
