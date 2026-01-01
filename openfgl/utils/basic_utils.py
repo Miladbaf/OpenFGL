@@ -107,22 +107,14 @@ def load_client(args, client_id, data, data_dir, message_pool, device):
         from openfgl.flcore.fedgl.client import FedGLClient
         return FedGLClient(args, client_id, data, data_dir, message_pool, device)
     elif args.fl_algorithm == "fedala":
-        if getattr(args, "scenario", None) == "graph_fl" and getattr(args, "task", None) in ["graph_cls", "graph_cls_2", "graph_reg"]:
-            from openfgl.flcore.fedala.client_graphfl import FedALAGraphFLClient
-            return FedALAGraphFLClient(args, client_id, data, data_dir, message_pool, device)
-        else:
-            from openfgl.flcore.fedala.client import FedALAClient
-            return FedALAClient(args, client_id, data, data_dir, message_pool, device)
+        from openfgl.flcore.fedala.client_ihsan import FedALAClient
+        return FedALAClient(args, client_id, data, data_dir, message_pool, device)
     elif args.fl_algorithm == "fedala_mp":
         from openfgl.flcore.fedala_mp.client import FedALAMPClient
         return FedALAMPClient(args, client_id, data, data_dir, message_pool, device)
     elif args.fl_algorithm == "fedala_r":
-        if getattr(args, "scenario", None) == "graph_fl" and getattr(args, "task", None) in ["graph_cls", "graph_cls_2", "graph_reg"]:
-            from openfgl.flcore.fedala_r.client_graphfl import FedALARGraphFLClient
-            return FedALARGraphFLClient(args, client_id, data, data_dir, message_pool, device)
-        else:
-            from openfgl.flcore.fedala_r.client import FedALARClient
-            return FedALARClient(args, client_id, data, data_dir, message_pool, device)
+        from openfgl.flcore.fedala_r.client_ihsan import FedALARClient
+        return FedALARClient(args, client_id, data, data_dir, message_pool, device)
     elif args.fl_algorithm == "fedala_mpr":
         from openfgl.flcore.fedala_mpr.client import FedALAMPRClient
         return FedALAMPRClient(args, client_id, data, data_dir, message_pool, device)
@@ -214,12 +206,8 @@ def load_server(args, global_data, data_dir, message_pool, device):
         from openfgl.flcore.fedavg.server import FedAvgServer
         return FedAvgServer(args, global_data, data_dir, message_pool, device)
     elif args.fl_algorithm == "fedala_r":
-        if getattr(args, "scenario", None) == "graph_fl" and getattr(args, "task", None) in ["graph_cls", "graph_cls_2", "graph_reg"]:
-            from openfgl.flcore.fedala_r.server_graphfl import FedALARGraphFLServer
-            return FedALARGraphFLServer(args, global_data, data_dir, message_pool, device)
-        else:
-            from openfgl.flcore.fedala_r.server import FedALARServer
-            return FedALARServer(args, global_data, data_dir, message_pool, device)
+        from openfgl.flcore.fedala_r.server_ihsan import FedALARServer
+        return FedALARServer(args, global_data, data_dir, message_pool, device)
     elif args.fl_algorithm == "fedala_mpr":
         from openfgl.flcore.fedala_r.server import FedALARServer
         return FedALARServer(args, global_data, data_dir, message_pool, device)

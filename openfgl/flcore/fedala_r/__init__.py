@@ -2,7 +2,7 @@
 FedALA-R: Residual Low-Rank Adaptive Aggregation
 """
 
-from .client import FedALARClient
-from .server import FedALARServer
+from .client_ihsan import FedALARClient
+from .server_ihsan import FedALARServer
 
 __all__ = ['FedALARClient', 'FedALARServer']

@@ -41,6 +41,7 @@ class AdaptiveLocalAggregation:
         device: torch.device | str = "cpu",
         std_threshold: float = 0.1,
         num_pre_loss: int = 10,
+        max_warmup_passes:int = 5
     ) -> None:
         """
         Args:
@@ -68,6 +69,7 @@ class AdaptiveLocalAggregation:
         self.device = torch.device(device)
         self.std_threshold = std_threshold
         self.num_pre_loss = num_pre_loss
+        self.max_warmup_passes = max_warmup_passes
 
         # Learned element-wise weights for the selected layers
         self._weights: Optional[list[torch.Tensor]] = None
@@ -317,6 +319,7 @@ class AdaptiveLocalAggregationGraphFL(AdaptiveLocalAggregation):
                 p_t.data.copy_(p_l.data + (p_g.data - p_l.data) * w.data)
 
         losses: list[float] = []
+        steps = 0
         warmup_passes = 0
 
         while True:
@@ -345,6 +348,7 @@ class AdaptiveLocalAggregationGraphFL(AdaptiveLocalAggregation):
                         p_t.data.copy_(p_l.data + (p_g.data - p_l.data) * w.data)
 
                 losses.append(float(loss.item()))
+                steps += 1
 
             if not self._warmup_phase:
                 break
