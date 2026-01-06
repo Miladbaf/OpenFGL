@@ -1,0 +1,243 @@
+================ EXPERIMENT CONFIG ================
+{
+  "ala_defaults": {
+    "ala_batch_size": 32,
+    "ala_eta": 0.05,
+    "ala_layer_idx": 1,
+    "ala_max_warmup_passes": 5,
+    "ala_num_pre_loss": 5,
+    "ala_rand_percent": 40.0,
+    "ala_std_threshold": 0.02
+  },
+  "base_multi_root": "C:\\Users\\suuser\\Desktop\\Practices\\OpenFGL\\OpenFGL\\data_table6_graphfl_a1_multi",
+  "dataset_instances": {
+    "AIDS": 1,
+    "BZR": 2,
+    "COX2": 2,
+    "MUTAG": 3
+  },
+  "datasets": [
+    "MUTAG",
+    "BZR",
+    "AIDS",
+    "COX2"
+  ],
+  "dirichlet_alpha": 1.0,
+  "methods": [
+    "fedala",
+    "fedala_r"
+  ],
+  "num_clients": 10,
+  "repo_root": "C:\\Users\\suuser\\Desktop\\Practices\\OpenFGL\\OpenFGL",
+  "residual_defaults": {
+    "residual_beta": 0.95,
+    "residual_clip_norm": 1.0,
+    "residual_gamma": 0.01,
+    "residual_start_round": 20
+  },
+  "scenario": "graph_fl",
+  "seeds": [
+    540,
+    204,
+    350
+  ],
+  "simulation_mode": "graph_fl_label_skew",
+  "task": "graph_cls_2",
+  "torch_version": "2.5.1",
+  "training_defaults": {
+    "batch_size": 128,
+    "dropout": 0.5,
+    "evaluation_mode": "local_model_on_local_data",
+    "lr": 0.001,
+    "model": [
+      "gin"
+    ],
+    "num_epochs": 2,
+    "num_rounds": 100,
+    "optim": "adam",
+    "weight_decay": 0.0005
+  }
+}
+===================================================
+
+
+================ SETUP: MUTAG | inst=01/3 | seed=540 ================
+
+[0001/48] fedala | MUTAG | inst=01 | seed=540 ...
+  [result] best_test_accuracy=0.7491
+[0002/48] fedala_r | MUTAG | inst=01 | seed=540 ...
+  [result] best_test_accuracy=0.8262
+
+================ SETUP: MUTAG | inst=01/3 | seed=204 ================
+
+[0003/48] fedala | MUTAG | inst=01 | seed=204 ...
+  [result] best_test_accuracy=0.7535
+[0004/48] fedala_r | MUTAG | inst=01 | seed=204 ...
+  [result] best_test_accuracy=0.7544
+
+================ SETUP: MUTAG | inst=01/3 | seed=350 ================
+
+[0005/48] fedala | MUTAG | inst=01 | seed=350 ...
+  [result] best_test_accuracy=0.8183
+[0006/48] fedala_r | MUTAG | inst=01 | seed=350 ...
+  [result] best_test_accuracy=0.6835
+
+================ SETUP: MUTAG | inst=02/3 | seed=540 ================
+
+[0007/48] fedala | MUTAG | inst=02 | seed=540 ...
+  [result] best_test_accuracy=0.8373
+[0008/48] fedala_r | MUTAG | inst=02 | seed=540 ...
+  [result] best_test_accuracy=0.7097
+
+================ SETUP: MUTAG | inst=02/3 | seed=204 ================
+
+[0009/48] fedala | MUTAG | inst=02 | seed=204 ...
+  [result] best_test_accuracy=0.5585
+[0010/48] fedala_r | MUTAG | inst=02 | seed=204 ...
+  [result] best_test_accuracy=0.7948
+
+================ SETUP: MUTAG | inst=02/3 | seed=350 ================
+
+[0011/48] fedala | MUTAG | inst=02 | seed=350 ...
+  [result] best_test_accuracy=0.7132
+[0012/48] fedala_r | MUTAG | inst=02 | seed=350 ...
+  [result] best_test_accuracy=0.8347
+
+================ SETUP: MUTAG | inst=03/3 | seed=540 ================
+
+[0013/48] fedala | MUTAG | inst=03 | seed=540 ...
+  [result] best_test_accuracy=0.7287
+[0014/48] fedala_r | MUTAG | inst=03 | seed=540 ...
+  [result] best_test_accuracy=0.6418
+
+================ SETUP: MUTAG | inst=03/3 | seed=204 ================
+
+[0015/48] fedala | MUTAG | inst=03 | seed=204 ...
+  [result] best_test_accuracy=0.7429
+[0016/48] fedala_r | MUTAG | inst=03 | seed=204 ...
+  [result] best_test_accuracy=0.6543
+
+================ SETUP: MUTAG | inst=03/3 | seed=350 ================
+
+[0017/48] fedala | MUTAG | inst=03 | seed=350 ...
+  [result] best_test_accuracy=0.6977
+[0018/48] fedala_r | MUTAG | inst=03 | seed=350 ...
+  [result] best_test_accuracy=0.6277
+
+================ SETUP: BZR | inst=01/2 | seed=540 ================
+
+[0019/48] fedala | BZR | inst=01 | seed=540 ...
+  [result] best_test_accuracy=0.8486
+[0020/48] fedala_r | BZR | inst=01 | seed=540 ...
+  [result] best_test_accuracy=0.7944
+
+================ SETUP: BZR | inst=01/2 | seed=204 ================
+
+[0021/48] fedala | BZR | inst=01 | seed=204 ...
+  [result] best_test_accuracy=0.8054
+[0022/48] fedala_r | BZR | inst=01 | seed=204 ...
+  [result] best_test_accuracy=0.8028
+
+================ SETUP: BZR | inst=01/2 | seed=350 ================
+
+[0023/48] fedala | BZR | inst=01 | seed=350 ...
+  [result] best_test_accuracy=0.8047
+[0024/48] fedala_r | BZR | inst=01 | seed=350 ...
+  [result] best_test_accuracy=0.8367
+
+================ SETUP: BZR | inst=02/2 | seed=540 ================
+
+[0025/48] fedala | BZR | inst=02 | seed=540 ...
+  [result] best_test_accuracy=0.8219
+[0026/48] fedala_r | BZR | inst=02 | seed=540 ...
+  [result] best_test_accuracy=0.8095
+
+================ SETUP: BZR | inst=02/2 | seed=204 ================
+
+[0027/48] fedala | BZR | inst=02 | seed=204 ...
+  [result] best_test_accuracy=0.7913
+[0028/48] fedala_r | BZR | inst=02 | seed=204 ...
+  [result] best_test_accuracy=0.8095
+
+================ SETUP: BZR | inst=02/2 | seed=350 ================
+
+[0029/48] fedala | BZR | inst=02 | seed=350 ...
+  [result] best_test_accuracy=0.8277
+[0030/48] fedala_r | BZR | inst=02 | seed=350 ...
+  [result] best_test_accuracy=0.8425
+
+================ SETUP: AIDS | inst=01/1 | seed=540 ================
+
+[0031/48] fedala | AIDS | inst=01 | seed=540 ...
+  [result] best_test_accuracy=0.9713
+[0032/48] fedala_r | AIDS | inst=01 | seed=540 ...
+  [result] best_test_accuracy=0.9620
+
+================ SETUP: AIDS | inst=01/1 | seed=204 ================
+
+[0033/48] fedala | AIDS | inst=01 | seed=204 ...
+  [result] best_test_accuracy=0.9474
+[0034/48] fedala_r | AIDS | inst=01 | seed=204 ...
+  [result] best_test_accuracy=0.9711
+
+================ SETUP: AIDS | inst=01/1 | seed=350 ================
+
+[0035/48] fedala | AIDS | inst=01 | seed=350 ...
+  [result] best_test_accuracy=0.9567
+[0036/48] fedala_r | AIDS | inst=01 | seed=350 ...
+  [result] best_test_accuracy=0.9521
+
+================ SETUP: COX2 | inst=01/2 | seed=540 ================
+
+[0037/48] fedala | COX2 | inst=01 | seed=540 ...
+  [result] best_test_accuracy=0.8605
+[0038/48] fedala_r | COX2 | inst=01 | seed=540 ...
+  [result] best_test_accuracy=0.8948
+
+================ SETUP: COX2 | inst=01/2 | seed=204 ================
+
+[0039/48] fedala | COX2 | inst=01 | seed=204 ...
+  [result] best_test_accuracy=0.8434
+[0040/48] fedala_r | COX2 | inst=01 | seed=204 ...
+  [result] best_test_accuracy=0.8054
+
+================ SETUP: COX2 | inst=01/2 | seed=350 ================
+
+[0041/48] fedala | COX2 | inst=01 | seed=350 ...
+  [result] best_test_accuracy=0.8054
+[0042/48] fedala_r | COX2 | inst=01 | seed=350 ...
+  [result] best_test_accuracy=0.8605
+
+================ SETUP: COX2 | inst=02/2 | seed=540 ================
+
+[0043/48] fedala | COX2 | inst=02 | seed=540 ...
+  [result] best_test_accuracy=0.8612
+[0044/48] fedala_r | COX2 | inst=02 | seed=540 ...
+  [result] best_test_accuracy=0.8590
+
+================ SETUP: COX2 | inst=02/2 | seed=204 ================
+
+[0045/48] fedala | COX2 | inst=02 | seed=204 ...
+  [result] best_test_accuracy=0.7764
+[0046/48] fedala_r | COX2 | inst=02 | seed=204 ...
+  [result] best_test_accuracy=0.8911
+
+================ SETUP: COX2 | inst=02/2 | seed=350 ================
+
+[0047/48] fedala | COX2 | inst=02 | seed=350 ...
+  [result] best_test_accuracy=0.8612
+[0048/48] fedala_r | COX2 | inst=02 | seed=350 ...
+  [result] best_test_accuracy=0.8819
+
+================ FINAL SUMMARY (mean ± std, NaNs ignored) ================
+fedala     | MUTAG      -> 73.33 ± 7.53 (n=9)
+fedala     | BZR        -> 81.66 ± 1.86 (n=6)
+fedala     | AIDS       -> 95.85 ± 0.99 (n=3)
+fedala     | COX2       -> 83.47 ± 3.27 (n=6)
+fedala_r   | MUTAG      -> 72.52 ± 7.55 (n=9)
+fedala_r   | BZR        -> 81.59 ± 1.76 (n=6)
+fedala_r   | AIDS       -> 96.17 ± 0.77 (n=3)
+fedala_r   | COX2       -> 86.55 ± 3.02 (n=6)
+
+Saved detailed results to: C:\Users\suuser\Desktop\Practices\OpenFGL\OpenFGL\ihsan\graphfl_fedala_fedalar_results.npy
+

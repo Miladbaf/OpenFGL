@@ -1,0 +1,123 @@
+================ EXPERIMENT CONFIG ================
+{
+  "ala_defaults": {
+    "ala_batch_size": 32,
+    "ala_eta": 0.05,
+    "ala_layer_idx": 1,
+    "ala_max_warmup_passes": 5,
+    "ala_num_pre_loss": 5,
+    "ala_rand_percent": 40.0,
+    "ala_std_threshold": 0.02
+  },
+  "client_counts": [
+    5,
+    10,
+    15,
+    20
+  ],
+  "dataset_instances": {
+    "AIDS": 1,
+    "BZR": 2,
+    "COX2": 2,
+    "MUTAG": 3
+  },
+  "datasets": [
+    "MUTAG",
+    "BZR",
+    "COX2",
+    "AIDS"
+  ],
+  "dirichlet_alpha": 1.0,
+  "methods": [
+    "fedavg",
+    "fedala",
+    "fedala_r"
+  ],
+  "multi_root": "C:\\Users\\suuser\\Desktop\\Practices\\OpenFGL\\OpenFGL\\data_table6_graphfl_a1_multi",
+  "repo_root": "C:\\Users\\suuser\\Desktop\\Practices\\OpenFGL\\OpenFGL",
+  "residual_defaults": {
+    "r_res_scale": 1.0,
+    "residual_beta": 0.95,
+    "residual_clip_norm": 1.0,
+    "residual_gamma": 0.05,
+    "residual_start_round": 10
+  },
+  "scenario": "graph_fl",
+  "seeds": [
+    540,
+    204,
+    350
+  ],
+  "simulation_mode": "graph_fl_label_skew",
+  "task": "graph_cls_2",
+  "torch_version": "2.5.1",
+  "training_defaults": {
+    "batch_size": 128,
+    "dropout": 0.5,
+    "evaluation_mode": "local_model_on_local_data",
+    "lr": 0.001,
+    "model": [
+      "gin"
+    ],
+    "num_epochs": 2,
+    "num_rounds": 100,
+    "optim": "adam",
+    "weight_decay": 0.0005
+  }
+}
+===================================================
+
+
+
+
+================ FINAL SUMMARY (mean ± std, NaNs ignored) ================
+fedavg    | MUTAG    | K= 5 -> 73.61 ± 10.99 (n=9)
+fedavg    | MUTAG    | K=10 -> 70.42 ± 8.62 (n=9)
+fedavg    | MUTAG    | K=15 -> 73.66 ± 9.33 (n=9)
+fedavg    | MUTAG    | K=20 -> no runs
+fedavg    | BZR      | K= 5 -> 82.27 ± 2.51 (n=6)
+fedavg    | BZR      | K=10 -> 81.25 ± 1.99 (n=6)
+fedavg    | BZR      | K=15 -> 78.74 ± 3.08 (n=6)
+fedavg    | BZR      | K=20 -> 75.15 ± 2.55 (n=6)
+fedavg    | COX2     | K= 5 -> 77.84 ± 4.75 (n=6)
+fedavg    | COX2     | K=10 -> 82.87 ± 3.03 (n=6)
+fedavg    | COX2     | K=15 -> 78.19 ± 1.00 (n=6)
+fedavg    | COX2     | K=20 -> 75.95 ± 1.52 (n=6)
+fedavg    | AIDS     | K= 5 -> 98.36 ± 0.61 (n=3)
+fedavg    | AIDS     | K=10 -> 95.68 ± 1.40 (n=3)
+fedavg    | AIDS     | K=15 -> 98.21 ± 0.53 (n=3)
+fedavg    | AIDS     | K=20 -> 96.14 ± 1.32 (n=3)
+fedala    | MUTAG    | K= 5 -> 78.16 ± 9.02 (n=9)
+fedala    | MUTAG    | K=10 -> 72.30 ± 7.92 (n=9)
+fedala    | MUTAG    | K=15 -> 66.98 ± 1.82 (n=9)
+fedala    | MUTAG    | K=20 -> no runs
+fedala    | BZR      | K= 5 -> 82.34 ± 5.40 (n=6)
+fedala    | BZR      | K=10 -> 81.77 ± 2.04 (n=6)
+fedala    | BZR      | K=15 -> 80.03 ± 1.96 (n=6)
+fedala    | BZR      | K=20 -> 77.75 ± 2.75 (n=6)
+fedala    | COX2     | K= 5 -> 78.62 ± 3.99 (n=6)
+fedala    | COX2     | K=10 -> 82.30 ± 3.06 (n=6)
+fedala    | COX2     | K=15 -> 79.89 ± 2.89 (n=6)
+fedala    | COX2     | K=20 -> 76.65 ± 2.76 (n=6)
+fedala    | AIDS     | K= 5 -> 99.34 ± 0.23 (n=3)
+fedala    | AIDS     | K=10 -> 96.32 ± 0.80 (n=3)
+fedala    | AIDS     | K=15 -> 98.01 ± 0.78 (n=3)
+fedala    | AIDS     | K=20 -> 96.22 ± 0.92 (n=3)
+fedala_r  | MUTAG    | K= 5 -> 78.28 ± 7.89 (n=9)
+fedala_r  | MUTAG    | K=10 -> 69.51 ± 4.86 (n=9)
+fedala_r  | MUTAG    | K=15 -> 62.77 ± 4.58 (n=9)
+fedala_r  | MUTAG    | K=20 -> no runs
+fedala_r  | BZR      | K= 5 -> 84.06 ± 5.68 (n=6)
+fedala_r  | BZR      | K=10 -> 79.84 ± 2.87 (n=6)
+fedala_r  | BZR      | K=15 -> 80.82 ± 2.20 (n=6)
+fedala_r  | BZR      | K=20 -> 77.23 ± 2.65 (n=6)
+fedala_r  | COX2     | K= 5 -> 79.80 ± 5.43 (n=6)
+fedala_r  | COX2     | K=10 -> 82.38 ± 2.76 (n=6)
+fedala_r  | COX2     | K=15 -> 79.65 ± 3.02 (n=6)
+fedala_r  | COX2     | K=20 -> 76.75 ± 2.41 (n=6)
+fedala_r  | AIDS     | K= 5 -> 99.67 ± 0.23 (n=3)
+fedala_r  | AIDS     | K=10 -> 95.52 ± 1.20 (n=3)
+fedala_r  | AIDS     | K=15 -> 99.17 ± 0.54 (n=3)
+fedala_r  | AIDS     | K=20 -> 95.98 ± 0.69 (n=3)
+
+Saved detailed results to: C:\Users\suuser\Desktop\Practices\OpenFGL\OpenFGL\results_scalability_graphfl_clients.npy

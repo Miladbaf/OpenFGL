@@ -28,7 +28,7 @@ from openfgl.data.distributed_dataset_loader import FGLDataset
 # ----------------------------
 # CONFIG
 # ----------------------------
-K = 10
+K = 20
 ALPHA = 1.0
 
 # Base directory (one subfolder per dataset instance)
@@ -36,16 +36,14 @@ BASE_ROOT = "../data_table6_graphfl_a1_multi"
 
 # How many independent instances to generate per dataset
 DATASET_INSTANCES = {
-    "MUTAG": 2,
     "COX2": 2,
     "BZR": 2,
     "AIDS": 1,
-    "PROTEINS": 3,
 }
 
 # Fixed list of seeds used to create different dataset instances.
 # (You can change these, but keep them fixed once you start reporting results.)
-INSTANCE_SEEDS = [11, 22, 33, 44, 55, 66, 77, 88, 99, 111]
+INSTANCE_SEEDS = [319, 216, 1312, 478, 1634, 1923, 1998, 1997]
 
 
 def seed_all(seed: int):

@@ -1,20 +1,14 @@
 """
-ihsan/run_compare_graphfl_methods.py
+ihsan/run_graphfl_fedala_grid.py
 
-Graph-FL experiment runner (graph_cls_2) with dataset instance support.
+Runs FedALA and FedALA-R on Graph-FL graph classification (graph_cls_2)
+with graph_fl_label_skew (alpha=1.0, K=10) across multiple dataset instances.
 
-Key behaviors:
-- Loops dataset -> instance -> seed -> methods
-- Deletes split cache ONCE per (dataset, instance, seed) so:
-    * different seeds create different train/val/test splits
-    * all methods share the same split for fair comparison
-- Supports uneven instance counts per dataset
-- Saves a single .npy payload with runs + summary + failures
-
-Run:
-  python -m ihsan.run_compare_graphfl_methods
-or
-  python ihsan/run_compare_graphfl_methods.py
+Outputs:
+- .npy payload containing:
+  - meta config
+  - per-run results
+  - per-method/dataset summary (mean/std)
 """
 
 from __future__ import annotations
@@ -33,9 +27,9 @@ import numpy as np
 import torch
 import torch.serialization
 
-# -----------------------------------------------------------------------------
-# Repo import path
-# -----------------------------------------------------------------------------
+# -------------------------------------------------------------------
+# Repo import path (so scripts can live under ihsan/)
+# -------------------------------------------------------------------
 THIS_FILE = Path(__file__).resolve()
 REPO_ROOT = THIS_FILE.parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -45,9 +39,9 @@ import openfgl.config as config
 from openfgl.flcore.trainer import FGLTrainer
 from openfgl.utils.basic_utils import seed_everything
 
-# -----------------------------------------------------------------------------
+# -------------------------------------------------------------------
 # Optional: PyTorch 2.6+ safe globals for PyG torch.load
-# -----------------------------------------------------------------------------
+# -------------------------------------------------------------------
 try:
     import torch_geometric.data.data as pyg_data
     import torch_geometric.data.storage as pyg_storage
@@ -65,34 +59,32 @@ except Exception:
 # =============================================================================
 # USER CONFIG
 # =============================================================================
-DATASETS = ["MUTAG", "COX2", "BZR", "AIDS", "PROTEINS"]
-METHODS = ["fedala", "fedala_r"]  # extend if needed: ["fedavg", "fedprox", ...]
-SEEDS = [42, 123, 456]
+DATASETS = [ "BZR", "AIDS", "COX2"]
+METHODS  = ["fedala", "fedala_r"]
+#SEEDS    = [42, 123, 456]
+SEEDS    = [540, 204, 350]
+METRIC   = "accuracy"
 
-METRIC = "accuracy"
 K_CLIENTS = 10
 DIRICHLET_ALPHA = 1.0
 
-BASE_INSTANCE_ROOTS: List[Path] = [
-    REPO_ROOT / "data_table6_graphfl_a1_multi" / "inst_01",
-    REPO_ROOT / "data_table6_graphfl_a1_multi" / "inst_02",
-    REPO_ROOT / "data_table6_graphfl_a1_multi" / "inst_03",
-]
-
-DATASET_INSTANCES: Dict[str, int] = {
-    "MUTAG": 2,
+# Your re-downloaded instance counts
+DATASET_INSTANCES = {
+    "MUTAG": 3,
     "COX2": 2,
     "BZR": 2,
     "AIDS": 1,
-    "PROTEINS": 3,
 }
 
-OUT_NPY = "./results_compare_graphfl_methods.npy"
+# Instance roots: BASE/inst_01, inst_02, ...
+BASE_MULTI_ROOT = REPO_ROOT / "data_table6_graphfl_a1_multi"
+
+OUT_NPY = str(REPO_ROOT / "ihsan" / "graphfl_fedala_fedalar_results.npy")
 
 TRAINING_DEFAULTS = dict(
     num_rounds=100,
     num_epochs=2,
-    lr=0.001,
+    lr=1e-3,
     weight_decay=5e-4,
     batch_size=128,
     dropout=0.5,
@@ -108,31 +100,31 @@ ALA_DEFAULTS = dict(
     ala_eta=0.05,
     ala_std_threshold=0.02,
     ala_num_pre_loss=5,
-    ala_max_warmup_passes=5,  # IMPORTANT: match your FedALAClient args name
+    ala_max_warmup_passes=5,
 )
 
+# If your fedala_r uses residual knobs from args, keep these:
 RESIDUAL_DEFAULTS = dict(
-    residual_gamma=0.05,
+    residual_gamma=0.01,
     residual_beta=0.95,
     residual_clip_norm=1.0,
-    residual_start_round=10,
+    residual_start_round=20,
 )
 
 SHOW_ROUND_LOGS = False
-STORE_STDIO_TAILS = True
 STDIO_TAIL_CHARS = 2000
 
 # =============================================================================
 # Helpers
 # =============================================================================
 def processed_dir_from_args(args) -> Path:
-    if args.simulation_mode in ["subgraph_fl_label_skew", "graph_fl_label_skew"]:
-        simulation_name = f"{args.simulation_mode}_{args.skew_alpha:.2f}"
+    if args.simulation_mode in ["graph_fl_label_skew", "subgraph_fl_label_skew"]:
+        sim_name = f"{args.simulation_mode}_{args.skew_alpha:.2f}"
     else:
-        simulation_name = args.simulation_mode
+        sim_name = args.simulation_mode
 
     ds = sorted(list(args.dataset))
-    folder = "_".join([simulation_name, "_".join(ds), f"client_{args.num_clients}"])
+    folder = "_".join([sim_name, "_".join(ds), f"client_{args.num_clients}"])
     return Path(args.root) / "distrib" / folder
 
 def assert_partitions_exist(proc_dir: Path, num_clients: int) -> None:
@@ -146,12 +138,8 @@ def assert_partitions_exist(proc_dir: Path, num_clients: int) -> None:
     if missing:
         raise FileNotFoundError("Missing client partition files:\n" + "\n".join(missing))
 
-def delete_default_split_cache(proc_dir: Path) -> None:
-    """
-    GraphClsTask (graph_cls_2) stores split masks under:
-      <processed_dir>/graph_cls/default_split/
-    Delete ONCE per (dataset, inst, seed) to force a fresh split for that seed.
-    """
+def delete_default_split(proc_dir: Path) -> None:
+    # OpenFGL caches splits here
     split_dir = proc_dir / "graph_cls" / "default_split"
     if split_dir.is_dir():
         shutil.rmtree(split_dir)
@@ -173,20 +161,13 @@ def make_args(dataset: str, inst_root: Path, seed: int, method: str):
     args.dirichlet_alpha = DIRICHLET_ALPHA
     args.skew_alpha = DIRICHLET_ALPHA
 
-    # windows-stability knobs
+    # Windows stability knobs
     args.num_workers = 0
     args.persistent_workers = False
 
     # training
-    args.num_rounds = TRAINING_DEFAULTS["num_rounds"]
-    args.num_epochs = TRAINING_DEFAULTS["num_epochs"]
-    args.lr = TRAINING_DEFAULTS["lr"]
-    args.weight_decay = TRAINING_DEFAULTS["weight_decay"]
-    args.batch_size = TRAINING_DEFAULTS["batch_size"]
-    args.dropout = TRAINING_DEFAULTS["dropout"]
-    args.optim = TRAINING_DEFAULTS["optim"]
-    args.model = TRAINING_DEFAULTS["model"]
-    args.evaluation_mode = TRAINING_DEFAULTS["evaluation_mode"]
+    for k, v in TRAINING_DEFAULTS.items():
+        setattr(args, k, v)
 
     # eval
     args.metrics = [METRIC]
@@ -195,21 +176,14 @@ def make_args(dataset: str, inst_root: Path, seed: int, method: str):
     args.fl_algorithm = method
     args.seed = seed
 
-    # ALA knobs (fedala and your fedala variants if they read args)
-    args.ala_batch_size = int(ALA_DEFAULTS["ala_batch_size"] or args.batch_size)
-    args.ala_rand_percent = float(ALA_DEFAULTS["ala_rand_percent"])
-    args.ala_layer_idx = int(ALA_DEFAULTS["ala_layer_idx"])
-    args.ala_eta = float(ALA_DEFAULTS["ala_eta"])
-    args.ala_std_threshold = float(ALA_DEFAULTS["ala_std_threshold"])
-    args.ala_num_pre_loss = int(ALA_DEFAULTS["ala_num_pre_loss"])
-    args.ala_max_warmup_passes = int(ALA_DEFAULTS["ala_max_warmup_passes"])
+    # ALA knobs
+    for k, v in ALA_DEFAULTS.items():
+        setattr(args, k, v)
 
-    # residual knobs (fedala_r only)
+    # residual knobs (if your fedala_r reads them from args)
     if method == "fedala_r":
-        args.residual_gamma = RESIDUAL_DEFAULTS["residual_gamma"]
-        args.residual_beta = RESIDUAL_DEFAULTS["residual_beta"]
-        args.residual_clip_norm = RESIDUAL_DEFAULTS["residual_clip_norm"]
-        args.residual_start_round = RESIDUAL_DEFAULTS["residual_start_round"]
+        for k, v in RESIDUAL_DEFAULTS.items():
+            setattr(args, k, v)
 
     return args
 
@@ -233,7 +207,7 @@ def main():
         "methods": METHODS,
         "seeds": SEEDS,
         "dataset_instances": DATASET_INSTANCES,
-        "base_instance_roots": [str(p) for p in BASE_INSTANCE_ROOTS],
+        "base_multi_root": str(BASE_MULTI_ROOT),
         "training_defaults": TRAINING_DEFAULTS,
         "ala_defaults": ALA_DEFAULTS,
         "residual_defaults": RESIDUAL_DEFAULTS,
@@ -242,7 +216,6 @@ def main():
         "simulation_mode": "graph_fl_label_skew",
         "num_clients": K_CLIENTS,
         "dirichlet_alpha": DIRICHLET_ALPHA,
-        "metric": METRIC,
         "torch_version": getattr(torch, "__version__", "unknown"),
     }
 
@@ -250,7 +223,7 @@ def main():
     print(json.dumps(cfg, indent=2, sort_keys=True))
     print("===================================================\n")
 
-    total_runs = sum(DATASET_INSTANCES[ds] for ds in DATASETS) * len(SEEDS) * len(METHODS)
+    total_runs = sum(DATASET_INSTANCES[d] for d in DATASETS) * len(SEEDS) * len(METHODS)
     run_idx = 0
 
     results = defaultdict(lambda: defaultdict(list))
@@ -259,65 +232,39 @@ def main():
 
     for dataset in DATASETS:
         n_inst = DATASET_INSTANCES[dataset]
-
         for inst_i in range(n_inst):
-            inst_root = BASE_INSTANCE_ROOTS[inst_i]
+            inst_root = BASE_MULTI_ROOT / f"inst_{inst_i+1:02d}"
 
             for seed in SEEDS:
-                print(
-                    f"\n================ SETUP: {dataset} | inst={inst_i+1:02d}/{n_inst} | seed={seed} ================\n",
-                    flush=True,
-                )
+                print(f"\n================ SETUP: {dataset} | inst={inst_i+1:02d}/{n_inst} | seed={seed} ================\n", flush=True)
 
-                # seed affects split generation + training stochasticity
-                seed_everything(seed)
-
-                # build args ONCE to locate processed_dir and reset split cache
-                args_for_dir = make_args(dataset, inst_root, seed, METHODS[0])
-                proc_dir = processed_dir_from_args(args_for_dir)
+                # Ensure methods share the same split for this dataset/inst/seed
+                base_args = make_args(dataset, inst_root, seed, METHODS[0])
+                proc_dir = processed_dir_from_args(base_args)
                 assert_partitions_exist(proc_dir, K_CLIENTS)
+                delete_default_split(proc_dir)
 
-                # critical: new split per seed, shared across methods
-                delete_default_split_cache(proc_dir)
+                seed_everything(seed)
 
                 for method in METHODS:
                     run_idx += 1
+                    print(f"[{run_idx:04d}/{total_runs}] {method} | {dataset} | inst={inst_i+1:02d} | seed={seed} ...", flush=True)
 
                     args = make_args(dataset, inst_root, seed, method)
-
-                    print(
-                        f"[{run_idx:04d}/{total_runs}] Running {method} | {dataset} | inst={inst_i+1:02d} | seed={seed} ...",
-                        flush=True,
-                    )
-                    print(
-                        "[config] " + json.dumps(
-                            {
-                                "dataset": dataset,
-                                "instance": inst_i + 1,
-                                "seed": seed,
-                                "method": method,
-                                "processed_dir": str(proc_dir),
-                            },
-                            sort_keys=True,
-                        ),
-                        flush=True,
-                    )
-
-                    f_out = io.StringIO()
-                    f_err = io.StringIO()
+                    f_out, f_err = io.StringIO(), io.StringIO()
 
                     try:
-                        ctx1 = nullcontext() if SHOW_ROUND_LOGS else redirect_stdout(f_out)
-                        ctx2 = nullcontext() if SHOW_ROUND_LOGS else redirect_stderr(f_err)
+                        ctx_out = nullcontext() if SHOW_ROUND_LOGS else redirect_stdout(f_out)
+                        ctx_err = nullcontext() if SHOW_ROUND_LOGS else redirect_stderr(f_err)
 
-                        with ctx1, ctx2:
+                        with ctx_out, ctx_err:
                             trainer = FGLTrainer(args)
                             trainer.train()
 
                         acc = extract_best_test(trainer, METRIC)
                         results[method][dataset].append(acc)
 
-                        rec = {
+                        runs.append({
                             "method": method,
                             "dataset": dataset,
                             "instance_index": inst_i + 1,
@@ -325,34 +272,31 @@ def main():
                             "seed": seed,
                             "processed_dir": str(proc_dir),
                             "best_test_accuracy": acc,
-                        }
-                        if STORE_STDIO_TAILS and (not SHOW_ROUND_LOGS):
-                            rec["stdout_tail"] = f_out.getvalue()[-STDIO_TAIL_CHARS:]
-                            rec["stderr_tail"] = f_err.getvalue()[-STDIO_TAIL_CHARS:]
+                            "stdout_tail": f_out.getvalue()[-STDIO_TAIL_CHARS:],
+                            "stderr_tail": f_err.getvalue()[-STDIO_TAIL_CHARS:],
+                        })
 
-                        runs.append(rec)
                         print(f"  [result] best_test_accuracy={acc:.4f}", flush=True)
 
                     except Exception as e:
                         err = str(e)
-                        failures.append(
-                            {
-                                "method": method,
-                                "dataset": dataset,
-                                "instance_index": inst_i + 1,
-                                "instance_root": str(inst_root),
-                                "seed": seed,
-                                "processed_dir": str(proc_dir),
-                                "error": err,
-                                "stdout_tail": f_out.getvalue()[-STDIO_TAIL_CHARS:],
-                                "stderr_tail": f_err.getvalue()[-STDIO_TAIL_CHARS:],
-                            }
-                        )
+                        failures.append({
+                            "method": method,
+                            "dataset": dataset,
+                            "instance_index": inst_i + 1,
+                            "instance_root": str(inst_root),
+                            "seed": seed,
+                            "processed_dir": str(proc_dir),
+                            "error": err,
+                            "stdout_tail": f_out.getvalue()[-STDIO_TAIL_CHARS:],
+                            "stderr_tail": f_err.getvalue()[-STDIO_TAIL_CHARS:],
+                        })
                         results[method][dataset].append(float(np.nan))
                         print(f"  [result] FAILED ({err})", flush=True)
-                        if (not SHOW_ROUND_LOGS) and f_err.getvalue().strip():
+                        tail = f_err.getvalue()[-STDIO_TAIL_CHARS:].strip()
+                        if tail:
                             print("  [captured stderr tail]")
-                            print(f_err.getvalue()[-STDIO_TAIL_CHARS:], flush=True)
+                            print(tail, flush=True)
 
     # Summary
     print("\n================ FINAL SUMMARY (mean ± std, NaNs ignored) ================")
@@ -365,7 +309,7 @@ def main():
             if vals.size:
                 m, s = float(vals.mean()), float(vals.std())
                 summary[method][dataset] = {"mean": m, "std": s, "n": int(vals.size)}
-                print(f"{method:10s} | {dataset:10s} -> {m:.4f} ± {s:.4f} (n={int(vals.size)})")
+                print(f"{method:10s} | {dataset:10s} -> {m*100:.2f} ± {s*100:.2f} (n={int(vals.size)})")
             else:
                 summary[method][dataset] = {"mean": float('nan'), "std": float('nan'), "n": 0}
                 print(f"{method:10s} | {dataset:10s} -> all runs failed")
@@ -377,7 +321,7 @@ def main():
         "failures": failures,
         "raw_results": {m: {d: results[m][d] for d in DATASETS} for m in METHODS},
     }
-    np.save(str(OUT_NPY), payload, allow_pickle=True)
+    np.save(OUT_NPY, payload, allow_pickle=True)
     print(f"\nSaved detailed results to: {OUT_NPY}", flush=True)
 
 if __name__ == "__main__":

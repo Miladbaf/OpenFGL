@@ -1,6 +1,5 @@
-C:\Users\suuser\AppData\Local\miniconda3\envs\openfgl\python.exe C:\Users\suuser\Desktop\Practices\OpenFGL\OpenFGL\ihsan\data_download_multi.py
 
-=== Processing MUTAG | instance 1/2 | alpha=1.0 | K=10 | seed=11 ===
+=== Processing MUTAG | instance 1/3 | alpha=1.0 | K=10 | seed=319 ===
 Processing...
 Downloading https://www.chrsmrrs.com/graphkerneldatasets/MUTAG.zip
 Processing...
@@ -9,22 +8,22 @@ Conducting graph-fl label skew simulation...
 num_classes: 2
 global label distribution: [ 63 125]
 label_counts:
-[[ 1 31]
- [ 3 19]
- [10 18]
- [ 1  8]
- [ 3  2]
- [ 4 16]
- [ 9 13]
- [12  5]
+[[ 3 37]
+ [ 2 18]
+ [ 2  5]
  [ 1 13]
- [19  0]]
+ [29  0]
+ [ 3 10]
+ [ 4  7]
+ [ 1 17]
+ [13  7]
+ [ 5 11]]
+Saved dataset arguments to ..\data_table6_graphfl_a1_multi\inst_01\distrib\graph_fl_label_skew_1.00_MUTAG_client_10\description.txt.
 Done!
 C:\Users\suuser\Desktop\Practices\OpenFGL\OpenFGL\openfgl\data\distributed_dataset_loader.py:121: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
   data = torch.load(osp.join(self.processed_dir, "data_{}.pt".format(client_id)))
-Saved dataset arguments to ..\data_table6_graphfl_a1_multi\inst_01\distrib\graph_fl_label_skew_1.00_MUTAG_client_10\description.txt.
 
-=== Processing MUTAG | instance 2/2 | alpha=1.0 | K=10 | seed=22 ===
+=== Processing MUTAG | instance 2/3 | alpha=1.0 | K=10 | seed=216 ===
 Processing...
 Downloading https://www.chrsmrrs.com/graphkerneldatasets/MUTAG.zip
 Processing...
@@ -33,43 +32,65 @@ Conducting graph-fl label skew simulation...
 num_classes: 2
 global label distribution: [ 63 125]
 label_counts:
-[[ 6 36]
- [14  9]
- [ 4  4]
- [ 8 10]
- [ 3  8]
- [ 4  6]
- [ 6  9]
- [ 3 10]
- [ 6 22]
- [ 9 11]]
-Saved dataset arguments to ..\data_table6_graphfl_a1_multi\inst_02\distrib\graph_fl_label_skew_1.00_MUTAG_client_10\description.txt.
+[[ 1 13]
+ [ 1 22]
+ [ 4 28]
+ [ 2 11]
+ [ 5 13]
+ [ 9  3]
+ [ 8 14]
+ [ 2  7]
+ [15  7]
+ [16  7]]
 Done!
-Processing...
+Saved dataset arguments to ..\data_table6_graphfl_a1_multi\inst_02\distrib\graph_fl_label_skew_1.00_MUTAG_client_10\description.txt.
 
-=== Processing COX2 | instance 1/2 | alpha=1.0 | K=10 | seed=11 ===
-Downloading https://www.chrsmrrs.com/graphkerneldatasets/COX2.zip
+=== Processing MUTAG | instance 3/3 | alpha=1.0 | K=10 | seed=1312 ===
+Processing...
+Downloading https://www.chrsmrrs.com/graphkerneldatasets/MUTAG.zip
 Processing...
 Done!
 Conducting graph-fl label skew simulation...
 num_classes: 2
-global label distribution: [365 102]
+global label distribution: [ 63 125]
 label_counts:
-[[ 40   2]
- [ 24  22]
- [ 21  26]
- [ 14   9]
- [ 11  25]
- [ 63   0]
- [147   0]
- [  6   8]
- [  7   2]
- [ 32   8]]
+[[13 39]
+ [ 3  4]
+ [12  0]
+ [12  2]
+ [ 2 17]
+ [ 5  0]
+ [ 4  6]
+ [10 11]
+ [ 0 39]
+ [ 2  7]]
+Done!
+Saved dataset arguments to ..\data_table6_graphfl_a1_multi\inst_03\distrib\graph_fl_label_skew_1.00_MUTAG_client_10\description.txt.
+
+=== Processing COX2 | instance 1/2 | alpha=1.0 | K=10 | seed=319 ===
+Processing...
+Downloading https://www.chrsmrrs.com/graphkerneldatasets/COX2.zip
+Processing...
+Conducting graph-fl label skew simulation...
+num_classes: 2
+global label distribution: [365 102]
+Done!
+label_counts:
+[[ 62   0]
+ [  5   2]
+ [ 12  20]
+ [ 14  10]
+ [ 60   0]
+ [100   0]
+ [ 11  49]
+ [ 81   0]
+ [  7   6]
+ [ 13  15]]
 Saved dataset arguments to ..\data_table6_graphfl_a1_multi\inst_01\distrib\graph_fl_label_skew_1.00_COX2_client_10\description.txt.
 Done!
 Processing...
 
-=== Processing COX2 | instance 2/2 | alpha=1.0 | K=10 | seed=22 ===
+=== Processing COX2 | instance 2/2 | alpha=1.0 | K=10 | seed=216 ===
 Downloading https://www.chrsmrrs.com/graphkerneldatasets/COX2.zip
 Processing...
 Done!
@@ -77,21 +98,21 @@ Conducting graph-fl label skew simulation...
 num_classes: 2
 global label distribution: [365 102]
 label_counts:
-[[32 19]
- [87  0]
- [86  0]
- [18 16]
- [26  8]
- [11  8]
- [ 4 11]
- [88  0]
- [ 7  7]
- [ 6 33]]
+[[97  0]
+ [10 31]
+ [ 1 27]
+ [40  4]
+ [11  2]
+ [63  0]
+ [50  0]
+ [13 17]
+ [71  0]
+ [ 9 21]]
 Saved dataset arguments to ..\data_table6_graphfl_a1_multi\inst_02\distrib\graph_fl_label_skew_1.00_COX2_client_10\description.txt.
 Done!
-
-=== Processing BZR | instance 1/2 | alpha=1.0 | K=10 | seed=11 ===
 Processing...
+
+=== Processing BZR | instance 1/2 | alpha=1.0 | K=10 | seed=319 ===
 Downloading https://www.chrsmrrs.com/graphkerneldatasets/BZR.zip
 Processing...
 Done!
@@ -99,20 +120,20 @@ Conducting graph-fl label skew simulation...
 num_classes: 2
 global label distribution: [319  86]
 label_counts:
-[[23 16]
- [ 9  7]
- [54  0]
- [50  0]
- [ 8 10]
- [52  0]
- [39  3]
- [76  0]
- [ 3 19]
- [ 5 31]]
-Done!
+[[  3  18]
+ [  8   7]
+ [ 31   5]
+ [ 81   0]
+ [ 35  12]
+ [ 12   3]
+ [100   0]
+ [  6   8]
+ [ 12  19]
+ [ 31  14]]
 Saved dataset arguments to ..\data_table6_graphfl_a1_multi\inst_01\distrib\graph_fl_label_skew_1.00_BZR_client_10\description.txt.
+Done!
 
-=== Processing BZR | instance 2/2 | alpha=1.0 | K=10 | seed=22 ===
+=== Processing BZR | instance 2/2 | alpha=1.0 | K=10 | seed=216 ===
 Processing...
 Downloading https://www.chrsmrrs.com/graphkerneldatasets/BZR.zip
 Processing...
@@ -121,21 +142,21 @@ Conducting graph-fl label skew simulation...
 num_classes: 2
 global label distribution: [319  86]
 label_counts:
-[[29 12]
- [ 4  2]
- [15 43]
- [84  0]
- [24  1]
- [23  1]
- [ 8 25]
- [29  0]
- [ 6  1]
- [97  1]]
+[[127   0]
+ [ 24  13]
+ [ 15   5]
+ [  2  16]
+ [ 14  11]
+ [ 25   0]
+ [  4   9]
+ [103   0]
+ [  3  12]
+ [  2  20]]
 Saved dataset arguments to ..\data_table6_graphfl_a1_multi\inst_02\distrib\graph_fl_label_skew_1.00_BZR_client_10\description.txt.
 Done!
-Processing...
 
-=== Processing AIDS | instance 1/1 | alpha=1.0 | K=10 | seed=11 ===
+=== Processing AIDS | instance 1/1 | alpha=1.0 | K=10 | seed=319 ===
+Processing...
 Downloading https://www.chrsmrrs.com/graphkerneldatasets/AIDS.zip
 Processing...
 Done!
@@ -143,21 +164,21 @@ Conducting graph-fl label skew simulation...
 num_classes: 2
 global label distribution: [ 400 1600]
 label_counts:
-[[ 13  37]
- [ 10   4]
- [  3 346]
- [104 110]
- [ 33  19]
- [ 28 155]
- [109 154]
- [ 13  58]
- [ 77 394]
- [ 10 323]]
+[[ 58 164]
+ [ 15  56]
+ [ 52 103]
+ [ 48 217]
+ [ 42 110]
+ [  9 421]
+ [  3 225]
+ [ 19 247]
+ [ 94  30]
+ [ 60  27]]
 Saved dataset arguments to ..\data_table6_graphfl_a1_multi\inst_01\distrib\graph_fl_label_skew_1.00_AIDS_client_10\description.txt.
 Done!
-Processing...
 
-=== Processing PROTEINS | instance 1/3 | alpha=1.0 | K=10 | seed=11 ===
+=== Processing PROTEINS | instance 1/2 | alpha=1.0 | K=10 | seed=319 ===
+Processing...
 Downloading https://www.chrsmrrs.com/graphkerneldatasets/PROTEINS.zip
 Processing...
 Done!
@@ -165,61 +186,39 @@ Conducting graph-fl label skew simulation...
 num_classes: 2
 global label distribution: [663 450]
 label_counts:
-[[ 49   5]
- [ 91 162]
- [122   0]
- [ 19  61]
- [188   0]
- [ 35  12]
- [  9  13]
- [ 11 165]
- [ 35  12]
- [104  20]]
+[[  2  74]
+ [319   0]
+ [ 73  44]
+ [100  16]
+ [ 11  77]
+ [ 55  28]
+ [ 42  79]
+ [ 19  22]
+ [ 18  91]
+ [ 24  19]]
 Saved dataset arguments to ..\data_table6_graphfl_a1_multi\inst_01\distrib\graph_fl_label_skew_1.00_PROTEINS_client_10\description.txt.
 Done!
 
-=== Processing PROTEINS | instance 2/3 | alpha=1.0 | K=10 | seed=22 ===
+=== Processing PROTEINS | instance 2/2 | alpha=1.0 | K=10 | seed=216 ===
 Processing...
 Downloading https://www.chrsmrrs.com/graphkerneldatasets/PROTEINS.zip
 Processing...
+Done!
 Conducting graph-fl label skew simulation...
 num_classes: 2
 global label distribution: [663 450]
-Done!
 label_counts:
-[[ 14  31]
- [ 12 102]
- [106  85]
- [ 17  33]
- [  9  32]
- [191   0]
- [ 27 106]
- [211   0]
- [ 11  54]
- [ 65   7]]
+[[326   0]
+ [ 24  55]
+ [ 96  24]
+ [ 29  50]
+ [ 34  19]
+ [  9  23]
+ [ 35   9]
+ [ 70  74]
+ [ 33 191]
+ [  7   5]]
 Saved dataset arguments to ..\data_table6_graphfl_a1_multi\inst_02\distrib\graph_fl_label_skew_1.00_PROTEINS_client_10\description.txt.
-Done!
-
-=== Processing PROTEINS | instance 3/3 | alpha=1.0 | K=10 | seed=33 ===
-Processing...
-Downloading https://www.chrsmrrs.com/graphkerneldatasets/PROTEINS.zip
-Processing...
-Done!
-Conducting graph-fl label skew simulation...
-num_classes: 2
-global label distribution: [663 450]
-label_counts:
-[[ 21  34]
- [ 40  17]
- [138   0]
- [  9 307]
- [186   0]
- [ 17   4]
- [ 80  11]
- [ 28  50]
- [ 73  21]
- [ 71   6]]
-Saved dataset arguments to ..\data_table6_graphfl_a1_multi\inst_03\distrib\graph_fl_label_skew_1.00_PROTEINS_client_10\description.txt.
 Done!
 
 Done.
