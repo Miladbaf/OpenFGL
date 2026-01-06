@@ -17,6 +17,15 @@ Main scripts:
 - run_scalability_analysis.py + generate_scalability_figure.py: scalability runs + plots
 - run_per_client_analysis.py: per-client analysis + plots
 - MIA_analysis.py: black-box membership inference privacy audit utilities
+
+
+GraphFL scripts:
+- ihsan/data_download_multi.py: Downloads datasets related to GraphFL study.
+- ihsan/run_baseline_experiments.py: Runs the baseline experiments for GraphFL study.
+- ihsan/run_graphfl_fedala_grid.py: Runs the FedAVG-FedALA-FedALAR experiments 
+- ihsan/run_scalability_graphfl_clients: The previous scripts focus on a single client size. This script applie a cross-client analysis.
+- ihsan/run_mia_graphcls.py: Runs the MIA analysis for GraphFL task.
+- The remaining files and scripts in the "ihsan" folder are used to process the obtained data for presentation.
   
 ## Installation
 

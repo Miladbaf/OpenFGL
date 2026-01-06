@@ -12,7 +12,7 @@ Outputs:
     tables/table_runtime_overhead_graphfl.csv
 
 Notes:
-- Expects per-run keys (as in your payload):
+- Expects per-run keys:
     wall_time_sec_per_round
     overhead_sec_per_round_vs_fedavg
     best_test_accuracy_percent
@@ -29,9 +29,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-# -----------------------------
 # Paths
-# -----------------------------
 THIS_FILE = Path(__file__).resolve()
 REPO_ROOT = THIS_FILE.parents[1]
 
@@ -43,9 +41,7 @@ TAB_DIR = OUT_DIR / "tables"
 FIG_DIR.mkdir(parents=True, exist_ok=True)
 TAB_DIR.mkdir(parents=True, exist_ok=True)
 
-# -----------------------------
 # Config
-# -----------------------------
 DATASETS = ["BZR", "COX2", "AIDS"]
 METHODS_ALL = ["fedavg", "fedala", "fedala_r"]
 METHODS_OVERHEAD = ["fedala", "fedala_r"]
@@ -54,9 +50,7 @@ METHOD_LABEL = {"fedavg": "FedAvg", "fedala": "FedALA", "fedala_r": "FedALA-R"}
 CLIENT_SIZES = [5, 10, 15, 20]
 
 
-# -----------------------------
 # IO
-# -----------------------------
 def load_payload(path: Path) -> dict:
     if not path.exists():
         raise FileNotFoundError(f"Missing file: {path}")
@@ -73,12 +67,10 @@ def to_df(payload: dict) -> pd.DataFrame:
     return df
 
 
-# -----------------------------
 # Normalization / derivations
-# -----------------------------
 def infer_time_per_round_sec(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Prefer wall_time_sec_per_round (your payload), otherwise derive total/rounds.
+    Prefer wall_time_sec_per_round, otherwise derive total/rounds.
     """
     df = df.copy()
 
@@ -113,7 +105,7 @@ def infer_time_per_round_sec(df: pd.DataFrame) -> pd.DataFrame:
 
 def infer_overhead_vs_fedavg(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Prefer overhead_sec_per_round_vs_fedavg (your payload).
+    Prefer overhead_sec_per_round_vs_fedavg (ayload).
     If missing, compute overhead by matching FedAvg on (dataset, K, seed, instance_index, repeat, is_warmup).
     """
     df = df.copy()
@@ -154,9 +146,7 @@ def summarize_mean_std(df: pd.DataFrame, value_col: str, group_cols: List[str]) 
     return g
 
 
-# -----------------------------
 # Table builder
-# -----------------------------
 def build_overhead_table(
     time_summary: pd.DataFrame,
     overhead_summary: pd.DataFrame,
@@ -234,9 +224,7 @@ def write_latex_table_overhead(df_table: pd.DataFrame, out_tex: Path) -> None:
     out_tex.write_text("\n".join(lines), encoding="utf-8")
 
 
-# -----------------------------
 # Plot builder (3 rows x 2 cols)
-# -----------------------------
 def plot_runtime_and_overhead(
     time_summary: pd.DataFrame,
     overhead_summary: pd.DataFrame,
@@ -306,7 +294,7 @@ def plot_runtime_and_overhead(
         ax_oh.set_xticks(ks)
         ax_oh.grid(True, linestyle="--", linewidth=0.5, alpha=0.6)
 
-        # Put legends only on the first row (matches your example intent)
+        # Put legends only on the first row
         if row_i == 0:
             ax_time.legend(loc="upper left", frameon=True, fontsize=9)
             ax_oh.legend(loc="upper left", frameon=True, fontsize=9)
@@ -316,9 +304,8 @@ def plot_runtime_and_overhead(
     plt.close(fig)
 
 
-# -----------------------------
+
 # Main
-# -----------------------------
 def main() -> None:
     payload = load_payload(IN_NPY)
     runs = to_df(payload)

@@ -25,9 +25,7 @@ import torch
 from openfgl import config
 from openfgl.data.distributed_dataset_loader import FGLDataset
 
-# ----------------------------
 # CONFIG
-# ----------------------------
 K = 20
 ALPHA = 1.0
 
@@ -42,7 +40,6 @@ DATASET_INSTANCES = {
 }
 
 # Fixed list of seeds used to create different dataset instances.
-# (You can change these, but keep them fixed once you start reporting results.)
 INSTANCE_SEEDS = [319, 216, 1312, 478, 1634, 1923, 1998, 1997]
 
 
@@ -55,7 +52,6 @@ def seed_all(seed: int):
 
 
 def make_args(dataset_name: str, instance_idx: int, instance_seed: int):
-    # IMPORTANT: config.args is a shared singleton -> deepcopy to isolate per dataset
     args = copy.deepcopy(config.args)
 
     # Isolated root per instance so nothing is overwritten / mixed
@@ -65,7 +61,7 @@ def make_args(dataset_name: str, instance_idx: int, instance_seed: int):
     # Core
     args.root = instance_root
     args.scenario = "graph_fl"
-    args.task = "graph_cls"   # keep graph_cls unless you *explicitly* need graph_cls_2 here
+    args.task = "graph_cls"
     args.dataset = [dataset_name]
     args.num_clients = K
 
@@ -80,8 +76,6 @@ def make_args(dataset_name: str, instance_idx: int, instance_seed: int):
     if not hasattr(args, "least_samples"):
         args.least_samples = 5
 
-    # If your dataset generation code uses args.seed or args.random_seed,
-    # set both; otherwise seeding is still enforced via seed_all().
     args.seed = instance_seed
     if hasattr(args, "random_seed"):
         args.random_seed = instance_seed

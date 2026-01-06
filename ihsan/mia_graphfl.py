@@ -28,9 +28,8 @@ from sklearn.model_selection import train_test_split
 
 warnings.filterwarnings("ignore")
 
-# -----------------------------
+
 # (1) SAFE torch.load patch (idempotent; avoids recursion in notebooks)
-# -----------------------------
 torch.load = torch.serialization.load
 if not hasattr(torch, "_openfgl_original_torch_load"):
     torch._openfgl_original_torch_load = torch.load
@@ -43,9 +42,7 @@ def patched_torch_load(*args, **kwargs):
 torch.load = patched_torch_load
 print("✓ torch.load patched safely (idempotent)")
 
-# -----------------------------
-# (2) Patch FedALA + FedALA-R loss_fn bug (same as your Subgraph-FL cell)
-# -----------------------------
+# (2) Patch FedALA + FedALA-R loss_fn bug
 def patch_get_ala_loss_fn(module, fn_name="_get_ala_loss_fn"):
     orig_name = f"_orig{fn_name}"
     if not hasattr(module, orig_name):
@@ -74,25 +71,23 @@ try:
     import openfgl.flcore.fedala_r.client_ihsan as alar_mod
     patch_get_ala_loss_fn(ala_mod)
     patch_get_ala_loss_fn(alar_mod)
-    print("✓ Patched _get_ala_loss_fn for FedALA and FedALA-R")
+    print("Patched _get_ala_loss_fn for FedALA and FedALA-R")
 except Exception as e:
-    print("⚠️ Could not patch FedALA modules. Error:", e)
+    print("⚠Could not patch FedALA modules. Error:", e)
 
-# -----------------------------
-# (3) OpenFGL imports
-# -----------------------------
+
+# OpenFGL imports
 import openfgl.config as config
 from openfgl.flcore.trainer import FGLTrainer
 
-# ==============================================================================
+
 # USER SETTINGS (Graph-FL)
-# ==============================================================================
 METHODS  = ["fedavg", "fedala", "fedala_r"]
 DATASETS = ["BZR", "COX2", "AIDS"]
 SEEDS    = [540, 204, 350]
 
 NUM_CLIENTS  = 10
-NUM_ROUNDS   = 50      # set 100 if you want
+NUM_ROUNDS   = 50
 LOCAL_EPOCHS = 2
 LR           = 1e-3
 WEIGHT_DECAY = 5e-4
@@ -103,15 +98,11 @@ MAX_POINTS_PER_CLASS = 5000   # cap members and non-members each (balanced)
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("✓ Device:", DEVICE)
 
-# If you use the multi-instance root (recommended for Graph-FL), set ROOT accordingly.
-# Otherwise you can point to your standard data root.
 REPO_ROOT = os.getcwd()
 DATA_ROOT = os.path.join(REPO_ROOT, "data_table6_graphfl_a1_multi", "inst_01")  # adjust if needed
 
 
-# ==============================================================================
 # (4) Robust model/logits helpers
-# ==============================================================================
 def find_first_module(obj, max_depth=10):
     visited = set()
     def _walk(x, depth):
@@ -197,9 +188,7 @@ def forward_logits_graph_batch(model, batch):
             raise RuntimeError(f"Could not forward model for graph batch. Last error: {e}")
 
 
-# ==============================================================================
 # (5) Extract client loaders (Graph-FL)
-# ==============================================================================
 def pick_clients(trainer):
     for obj in [getattr(trainer, "server", None), trainer]:
         if obj is None: continue
@@ -319,21 +308,19 @@ def collect_member_nonmember_loaders(trainer, prefer_nonmember="test"):
     if not train_loaders:
         raise AttributeError(
             "No client train loaders found. "
-            "This usually means the trainer does not keep client objects after training, "
+            "This means the trainer does not keep client objects after training, "
             "or the task does not expose train_dataloader for this scenario/task."
         )
     if not non_loaders:
         raise AttributeError(
             f"No client non-member loaders found ({non_name}). "
-            "Check whether your task provides test_dataloader/val_dataloader."
+            "Check whether task provides test_dataloader/val_dataloader."
         )
 
     return train_loaders, non_loaders
 
 
-# ==============================================================================
 # (6) Compute per-graph features from loaders
-# ==============================================================================
 def features_from_loaders(model, loaders, device, max_points, seed=0):
     rng = np.random.default_rng(seed)
     losses, confs, ents = [], [], []
@@ -369,9 +356,8 @@ def features_from_loaders(model, loaders, device, max_points, seed=0):
     return losses[idx], confs[idx], ents[idx]
 
 
-# ==============================================================================
+
 # (7) MIA computations (same attackers as Subgraph-FL)
-# ==============================================================================
 def mia_from_features(mem_feat, non_feat, seed=0):
     mem_loss, mem_conf, mem_ent = mem_feat
     non_loss, non_conf, non_ent = non_feat
@@ -409,9 +395,7 @@ def mia_from_features(mem_feat, non_feat, seed=0):
     }
 
 
-# ==============================================================================
 # (8) Run training + audit (Graph-FL)
-# ==============================================================================
 rows = []
 
 for method in METHODS:
@@ -428,14 +412,14 @@ for method in METHODS:
             args.dataset = [dataset]
             args.processing = "raw"
 
-            # Simulation (match your Graph-FL runs)
+            # Simulation
             args.simulation_mode = "graph_fl_label_skew"
             args.num_clients = int(NUM_CLIENTS)
             args.client_frac = 1.0
             args.dirichlet_alpha = 1.0
             args.skew_alpha = 1.0
 
-            # Model/training (match your Graph-FL baseline settings)
+            # Model/training
             args.model = ["gin"]
             args.num_rounds = int(NUM_ROUNDS)
             args.num_epochs = int(LOCAL_EPOCHS)
@@ -462,7 +446,7 @@ for method in METHODS:
             non_feat = features_from_loaders(model, non_loaders, DEVICE, MAX_POINTS_PER_CLASS, seed=seed)
 
             if mem_feat is None or non_feat is None:
-                print("⚠️ Skipped: could not extract member/non-member features.")
+                print("Skipped: could not extract member/non-member features.")
                 continue
 
             audit = mia_from_features(mem_feat, non_feat, seed=seed)
@@ -486,4 +470,4 @@ if len(df) > 0:
 
     df.to_csv("mia_graphfl_results.csv", index=False)
     mean_df.to_csv("mia_graphfl_results_mean.csv", index=False)
-    print("\n✅ Saved: mia_graphfl_results.csv and mia_graphfl_results_mean.csv")
+    print("\nSaved: mia_graphfl_results.csv and mia_graphfl_results_mean.csv")

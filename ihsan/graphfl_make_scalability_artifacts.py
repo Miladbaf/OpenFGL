@@ -26,9 +26,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-# -----------------------------------------------------------------------------
-# NumPy pickle compat patch (numpy._core <-> numpy.core), useful if npy saved elsewhere
-# -----------------------------------------------------------------------------
+# NumPy pickle compat patch, useful if npy saved elsewhere
 def _patch_numpy_core_aliases() -> None:
     try:
         import numpy._core  # noqa: F401
@@ -52,9 +50,7 @@ def _patch_numpy_core_aliases() -> None:
 _patch_numpy_core_aliases()
 
 
-# -----------------------------------------------------------------------------
 # Paths
-# -----------------------------------------------------------------------------
 THIS_FILE = Path(__file__).resolve()
 REPO_ROOT = THIS_FILE.parents[1]
 
@@ -69,9 +65,7 @@ TABLE_DIR.mkdir(parents=True, exist_ok=True)
 FIG_DIR.mkdir(parents=True, exist_ok=True)
 
 
-# -----------------------------------------------------------------------------
 # Paper Table 6 references (Graph-FL test acc %, mean±std)
-# -----------------------------------------------------------------------------
 PAPER_TABLE6: Dict[str, Dict[str, Tuple[float, float]]] = {
     "fedavg": {
         "MUTAG": (78.9, 2.9),
@@ -112,9 +106,7 @@ METHOD_LABEL = {"fedavg": "FedAvg", "fedala": "FedALA", "fedala_r": "FedALA-R"}
 
 
 
-# -----------------------------------------------------------------------------
 # IO / normalization
-# -----------------------------------------------------------------------------
 def load_payload(path: Path) -> dict:
     if not path.exists():
         raise FileNotFoundError(f"Missing file: {path}")
@@ -186,9 +178,7 @@ def write_tex(path: Path, tex: str) -> None:
     print(f"[saved] {path}")
 
 
-# -----------------------------------------------------------------------------
-# LaTeX table builders (Overleaf-friendly)
-# -----------------------------------------------------------------------------
+# LaTeX table builders
 def latex_table_baselines_vs_paper(baseline_df: pd.DataFrame) -> str:
     s = summarize(baseline_df, ["method", "dataset"])
     s = s[s["dataset"].isin(FOCUS_DATASETS)].copy()
@@ -309,9 +299,7 @@ def latex_table_scalability(scal_df: pd.DataFrame) -> str:
     return "\n".join(tex)
 
 
-# -----------------------------------------------------------------------------
 # Plot builders
-# -----------------------------------------------------------------------------
 def plot_accuracy_vs_clients_scalability(
     scal_df: pd.DataFrame,
     out_pdf: Path,
@@ -325,8 +313,6 @@ def plot_accuracy_vs_clients_scalability(
 
     # Ensure K is integer and sorted; x-axis must be multiples of 5
     Ks = sorted(int(k) for k in s["K"].dropna().unique())
-    # If you want to force [5,10,15,20] even when some are missing:
-    # Ks = [5, 10, 15, 20]
 
     fig, axes = plt.subplots(1, 3, figsize=(11.5, 3.2), constrained_layout=True)
 
@@ -428,7 +414,7 @@ def plot_k10_relative_improvement_bar(
     out_png: Path,
 ) -> None:
     """
-    For K=10 (your main setting), show RELATIVE improvement over FedAvg:
+    For K=10, show RELATIVE improvement over FedAvg:
       (method_mean - fedavg_mean) / fedavg_mean * 100
     for FedALA and FedALA-R, per dataset.
     """
@@ -470,9 +456,7 @@ def plot_k10_relative_improvement_bar(
     print(f"[saved] {out_png}")
 
 
-# -----------------------------------------------------------------------------
 # Main
-# -----------------------------------------------------------------------------
 def main() -> None:
     baseline_runs = add_acc_percent(to_runs_df(load_payload(BASELINE_NPY)))
     fedala_runs = add_acc_percent(to_runs_df(load_payload(FEDALA_NPY)))
@@ -514,11 +498,6 @@ def main() -> None:
         allow_pickle=True,
     )
     print(f"[saved] {out_payload}")
-
-    print("\nOverleaf usage (suggested):")
-    print("  - Copy ihsan/overleaf_graphfl_artifacts/tables/*.tex into your Overleaf tables/ folder and use \\input{tables/<file>.tex}")
-    print("  - Copy ihsan/overleaf_graphfl_artifacts/figs/*.pdf into your Overleaf figs/ folder and include with \\includegraphics")
-
 
 if __name__ == "__main__":
     main()

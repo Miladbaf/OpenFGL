@@ -9,12 +9,12 @@ Goal:
     (a) Runtime vs #clients (mean ± std)
     (b) Overhead vs FedAvg (FedALA−FedAvg, FedALA-R−FedAvg)
 
-Scope (per your request):
+Scope:
 - Datasets: BZR, COX2, AIDS   (MUTAG omitted)
 - Methods:  fedavg, fedala, fedala_r
 - Client counts (K): [5, 10, 15, 20]
 - Seeds: [540, 204, 350]
-- Uses your already-downloaded multi-instance partitions under:
+- Usesalready-downloaded multi-instance partitions under:
     <REPO_ROOT>/data_table6_graphfl_a1_multi/inst_XX/distrib/...
 
 Key behavior for fairness:
@@ -49,9 +49,7 @@ import torch
 import torch.serialization
 
 
-# -----------------------------------------------------------------------------
 # PyTorch 2.6+ compatibility: avoid weights_only=True default surprises
-# -----------------------------------------------------------------------------
 _original_torch_load = torch.load
 def patched_torch_load(*args, **kwargs):
     if "weights_only" not in kwargs:
@@ -60,9 +58,7 @@ def patched_torch_load(*args, **kwargs):
 torch.load = patched_torch_load
 
 
-# -----------------------------------------------------------------------------
 # Repo import path: keep scripts inside /ihsan without moving them
-# -----------------------------------------------------------------------------
 THIS_FILE = Path(__file__).resolve()
 REPO_ROOT = THIS_FILE.parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -73,9 +69,7 @@ from openfgl.flcore.trainer import FGLTrainer
 from openfgl.utils.basic_utils import seed_everything
 
 
-# -----------------------------------------------------------------------------
-# Optional: safe globals for torch.load with PyG objects (if needed)
-# -----------------------------------------------------------------------------
+# Optional: safe globals for torch.load with PyG objects
 try:
     import torch_geometric.data.data as pyg_data
     import torch_geometric.data.storage as pyg_storage
@@ -91,9 +85,7 @@ except Exception:
     pass
 
 
-# =============================================================================
 # USER CONFIG
-# =============================================================================
 DATASETS = ["BZR", "COX2", "AIDS"]
 METHODS  = ["fedavg", "fedala", "fedala_r"]
 
@@ -101,9 +93,8 @@ SEEDS = [540, 204, 350]
 CLIENT_COUNTS = [5, 10, 15, 20]
 
 METRIC = "accuracy"
-DIRICHLET_ALPHA = 1.0  # fixed for your downloaded partitions
+DIRICHLET_ALPHA = 1.0
 
-# Instance counts in your multi-root
 DATASET_INSTANCES: Dict[str, int] = {
     "COX2": 1,
     "BZR": 1,
@@ -115,7 +106,6 @@ MULTI_ROOT = REPO_ROOT / "data_table6_graphfl_a1_multi"
 
 OUT_NPY = str(REPO_ROOT / "results_runtime_graphfl_clients.npy")
 
-# Training defaults: keep aligned with your Graph-FL baseline/FedALA runs
 TRAINING_DEFAULTS = dict(
     num_rounds=100,
     num_epochs=2,          # (OpenFGL uses num_epochs for local epochs in this scenario)
@@ -139,7 +129,7 @@ ALA_DEFAULTS = dict(
     ala_max_warmup_passes=5,
 )
 
-# FedALA-R knobs (server/client; harmless if unused)
+# FedALA-R knobs
 RESIDUAL_DEFAULTS = dict(
     residual_gamma=0.05,
     residual_beta=0.95,
@@ -152,15 +142,11 @@ SHOW_ROUND_LOGS = False
 STORE_STDIO_TAILS = True
 STDIO_TAIL_CHARS = 2000
 
-# If you want more stable runtime estimates:
-# - set WARMUP_RUNS=1 and REPEATS=3 (like your Subgraph-FL runtime protocol)
 WARMUP_RUNS = 0
 REPEATS = 1
 
 
-# =============================================================================
 # Helpers
-# =============================================================================
 def processed_dir_from_args(args) -> Path:
     # matches OpenFGL distributed_dataset_loader naming
     if args.simulation_mode in ["subgraph_fl_label_skew", "graph_fl_label_skew"]:
@@ -307,13 +293,11 @@ def summarize(values: List[float]) -> Tuple[float, float, int]:
     if arr.size == 0:
         return float("nan"), float("nan"), 0
     mean = float(arr.mean())
-    std = float(arr.std(ddof=0))  # match your other summaries
+    std = float(arr.std(ddof=0))
     return mean, std, int(arr.size)
 
 
-# =============================================================================
 # Main
-# =============================================================================
 def main():
     runner_cfg = print_experiment_config()
 
@@ -490,9 +474,7 @@ def main():
                                     print("  [captured stderr tail]")
                                     print(f_err.getvalue()[-STDIO_TAIL_CHARS:], flush=True)
 
-    # -----------------------------------------------------------------------------
     # Summaries (accuracy + runtime)
-    # -----------------------------------------------------------------------------
     summary: Dict[str, Any] = {
         "accuracy_percent": {},
         "time_per_round_sec": {},

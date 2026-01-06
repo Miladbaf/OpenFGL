@@ -31,9 +31,7 @@ import numpy as np
 import pandas as pd
 
 
-# -----------------------------------------------------------------------------
-# NumPy pickle compat patch (numpy._core <-> numpy.core)
-# -----------------------------------------------------------------------------
+# NumPy pickle compat patch
 def _patch_numpy_core_aliases() -> None:
     try:
         import numpy._core  # noqa: F401
@@ -57,9 +55,7 @@ def _patch_numpy_core_aliases() -> None:
 _patch_numpy_core_aliases()
 
 
-# -----------------------------------------------------------------------------
 # Paths (repo-relative)
-# -----------------------------------------------------------------------------
 THIS_FILE = Path(__file__).resolve()
 REPO_ROOT = THIS_FILE.parents[1]
 
@@ -71,9 +67,7 @@ OUT_DIR = REPO_ROOT / "ihsan" / "outputs_tables"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-# -----------------------------------------------------------------------------
 # Paper references (Graph-FL Table 6, accuracy in %)
-# -----------------------------------------------------------------------------
 PAPER_TABLE6: Dict[str, Dict[str, Tuple[float, float]]] = {
     "fedavg": {
         "MUTAG": (78.9, 2.9),
@@ -107,13 +101,11 @@ PAPER_TABLE6: Dict[str, Dict[str, Tuple[float, float]]] = {
     },
 }
 
-# AIDS FedAvg reference you provided (not in Table 6)
+# AIDS FedAvg reference
 PAPER_AIDS_FEDAVG = (94.2, 0.7)
 
 
-# -----------------------------------------------------------------------------
 # IO helpers
-# -----------------------------------------------------------------------------
 def load_payload(path: Path) -> dict:
     if not path.exists():
         raise FileNotFoundError(f"Missing file: {path}")
@@ -127,9 +119,7 @@ def to_runs_df(payload: dict) -> pd.DataFrame:
     return pd.DataFrame(payload.get("runs", []))
 
 
-# -----------------------------------------------------------------------------
 # Normalization + summarization
-# -----------------------------------------------------------------------------
 def add_accuracy_percent(df: pd.DataFrame) -> pd.DataFrame:
     """
     Adds column 'acc_percent' in [%].
@@ -159,7 +149,6 @@ def add_accuracy_percent(df: pd.DataFrame) -> pd.DataFrame:
 def summarize_runs(df: pd.DataFrame, group_cols: List[str], value_col: str = "acc_percent") -> pd.DataFrame:
     """
     mean/std/n over groups, ignoring NaNs.
-    IMPORTANT: std uses ddof=0 to match your printed summaries.
     """
     if df.empty:
         return pd.DataFrame(columns=group_cols + ["mean", "std", "n"])
@@ -185,9 +174,7 @@ def fmt_mean_std(mean: float, std: float, decimals: int = 2) -> str:
     return f"{mean:.{decimals}f} ± {std:.{decimals}f}"
 
 
-# -----------------------------------------------------------------------------
 # Table builders
-# -----------------------------------------------------------------------------
 def build_table1_baselines_vs_paper(baseline_runs: pd.DataFrame) -> pd.DataFrame:
     s = summarize_runs(baseline_runs, group_cols=["method", "dataset"])
     rows = []
@@ -267,9 +254,7 @@ def build_table3_scalability(scal_runs: pd.DataFrame, datasets: Optional[List[st
     return pivot
 
 
-# -----------------------------------------------------------------------------
 # Save helpers
-# -----------------------------------------------------------------------------
 def save_table(df: pd.DataFrame, stem: str) -> None:
     csv_path = OUT_DIR / f"{stem}.csv"
     tex_path = OUT_DIR / f"{stem}.tex"
@@ -280,9 +265,7 @@ def save_table(df: pd.DataFrame, stem: str) -> None:
     print(f"[saved] {tex_path}")
 
 
-# -----------------------------------------------------------------------------
 # Main
-# -----------------------------------------------------------------------------
 def main() -> None:
     baseline_runs = add_accuracy_percent(to_runs_df(load_payload(BASELINE_NPY)))
     fedala_runs = add_accuracy_percent(to_runs_df(load_payload(FEDALA_NPY)))

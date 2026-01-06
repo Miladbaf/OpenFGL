@@ -27,9 +27,7 @@ import numpy as np
 import torch
 import torch.serialization
 
-# -------------------------------------------------------------------
-# Repo import path (so scripts can live under ihsan/)
-# -------------------------------------------------------------------
+# Repo import path
 THIS_FILE = Path(__file__).resolve()
 REPO_ROOT = THIS_FILE.parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -39,9 +37,7 @@ import openfgl.config as config
 from openfgl.flcore.trainer import FGLTrainer
 from openfgl.utils.basic_utils import seed_everything
 
-# -------------------------------------------------------------------
 # Optional: PyTorch 2.6+ safe globals for PyG torch.load
-# -------------------------------------------------------------------
 try:
     import torch_geometric.data.data as pyg_data
     import torch_geometric.data.storage as pyg_storage
@@ -56,9 +52,7 @@ try:
 except Exception:
     pass
 
-# =============================================================================
 # USER CONFIG
-# =============================================================================
 DATASETS = [ "BZR", "AIDS", "COX2"]
 METHODS  = ["fedala", "fedala_r"]
 #SEEDS    = [42, 123, 456]
@@ -68,7 +62,6 @@ METRIC   = "accuracy"
 K_CLIENTS = 10
 DIRICHLET_ALPHA = 1.0
 
-# Your re-downloaded instance counts
 DATASET_INSTANCES = {
     "MUTAG": 3,
     "COX2": 2,
@@ -103,7 +96,6 @@ ALA_DEFAULTS = dict(
     ala_max_warmup_passes=5,
 )
 
-# If your fedala_r uses residual knobs from args, keep these:
 RESIDUAL_DEFAULTS = dict(
     residual_gamma=0.01,
     residual_beta=0.95,
@@ -114,9 +106,7 @@ RESIDUAL_DEFAULTS = dict(
 SHOW_ROUND_LOGS = False
 STDIO_TAIL_CHARS = 2000
 
-# =============================================================================
 # Helpers
-# =============================================================================
 def processed_dir_from_args(args) -> Path:
     if args.simulation_mode in ["graph_fl_label_skew", "subgraph_fl_label_skew"]:
         sim_name = f"{args.simulation_mode}_{args.skew_alpha:.2f}"
@@ -180,7 +170,7 @@ def make_args(dataset: str, inst_root: Path, seed: int, method: str):
     for k, v in ALA_DEFAULTS.items():
         setattr(args, k, v)
 
-    # residual knobs (if your fedala_r reads them from args)
+    # residual knobs
     if method == "fedala_r":
         for k, v in RESIDUAL_DEFAULTS.items():
             setattr(args, k, v)
@@ -197,9 +187,7 @@ def extract_best_test(trainer: FGLTrainer, metric: str) -> float:
             return float(np.nan)
     return float(np.nan)
 
-# =============================================================================
 # Main
-# =============================================================================
 def main():
     cfg = {
         "repo_root": str(REPO_ROOT),

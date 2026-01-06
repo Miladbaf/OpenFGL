@@ -38,9 +38,8 @@ import numpy as np
 import torch
 import torch.serialization
 
-# -------------------------------------------------------------------
+
 # Repo import path: keep scripts inside /ihsan without moving them
-# -------------------------------------------------------------------
 THIS_FILE = Path(__file__).resolve()
 REPO_ROOT = THIS_FILE.parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -50,9 +49,7 @@ import openfgl.config as config
 from openfgl.flcore.trainer import FGLTrainer
 from openfgl.utils.basic_utils import seed_everything
 
-# -------------------------------------------------------------------
-# Optional: PyTorch safe globals for PyG torch.load (if needed)
-# -------------------------------------------------------------------
+# Optional: PyTorch safe globals for PyG torch.load
 try:
     import torch_geometric.data.data as pyg_data
     import torch_geometric.data.storage as pyg_storage
@@ -67,22 +64,18 @@ try:
 except Exception:
     pass
 
-# =============================================================================
 # USER CONFIG
-# =============================================================================
 DATASETS = ["BZR", "COX2", "AIDS"]
 METHODS  = ["fedavg", "fedala", "fedala_r"]
 
-# You requested these seeds explicitly
 SEEDS = [540, 204, 350]
 
-# Client counts for scalability curve (edit if desired)
+# Client counts for scalability curve
 CLIENT_COUNTS = [5, 10, 15, 20]
 
 METRIC = "accuracy"
-DIRICHLET_ALPHA = 1.0  # fixed for your downloaded partitions
+DIRICHLET_ALPHA = 1.0
 
-# Your new instance counts
 DATASET_INSTANCES: Dict[str, int] = {
     "MUTAG": 3,
     "COX2": 2,
@@ -95,7 +88,7 @@ MULTI_ROOT = REPO_ROOT / "data_table6_graphfl_a1_multi"
 
 OUT_NPY = str(REPO_ROOT / "results_scalability_graphfl_clients.npy")
 
-# Training defaults (keep aligned with what you used for baselines/FedALA comparisons)
+# Training defaults
 TRAINING_DEFAULTS = dict(
     num_rounds=100,
     num_epochs=2,
@@ -119,7 +112,6 @@ ALA_DEFAULTS = dict(
     ala_max_warmup_passes=5,
 )
 
-# FedALA-R server/client knobs (kept consistent with your repo conventions)
 # Server-side likely uses residual_*; client currently uses r_res_scale.
 RESIDUAL_DEFAULTS = dict(
     residual_gamma=0.05,
@@ -133,9 +125,7 @@ SHOW_ROUND_LOGS = False
 STORE_STDIO_TAILS = True
 STDIO_TAIL_CHARS = 2000
 
-# =============================================================================
 # Helpers
-# =============================================================================
 def processed_dir_from_args(args) -> Path:
     # matches OpenFGL distributed_dataset_loader naming
     if args.simulation_mode in ["subgraph_fl_label_skew", "graph_fl_label_skew"]:
@@ -250,9 +240,7 @@ def print_experiment_config() -> Dict[str, Any]:
     return cfg
 
 
-# =============================================================================
 # Main
-# =============================================================================
 def main():
     runner_cfg = print_experiment_config()
 
